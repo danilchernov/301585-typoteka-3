@@ -1,7 +1,7 @@
 # Личный проект «Типотека» [![Build status][travis-image]][travis-url]
 
 * Студент: [Данил Чернов](https://up.htmlacademy.ru/nodejs/3/user/301585).
-* Наставник: `Неизвестно`.
+* Наставник: `Юрий Кучма`.
 
 ---
 
