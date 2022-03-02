@@ -1,5 +1,6 @@
 "use strict";
 
+const chalk = require(`chalk`);
 const commandLineUsage = require(`command-line-usage`);
 
 const generateUsageInformation = () => {
@@ -34,12 +35,12 @@ const generateUsageInformation = () => {
     },
   ];
 
-  return commandLineUsage(sections);
+  return chalk.gray(commandLineUsage(sections));
 };
 
 module.exports = {
   name: `--help`,
   run() {
-    console.log(generateUsageInformation());
+    console.info(generateUsageInformation());
   },
 };
