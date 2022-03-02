@@ -1,6 +1,7 @@
 'use strict';
 
-const fs = require(`fs`);
+const fs = require(`fs`).promises;
+const chalk = require(`chalk`);
 const {EXIT_CODE} = require(`../../constants`);
 const {shuffle, getRandomInt, getRandomDate, formatDate} = require(`../../utils`);
 
@@ -99,24 +100,26 @@ const generateOffers = (count) => {
 
 module.exports = {
   name: `--generate`,
-  run(args) {
+  async run(args) {
     const [count] = args;
     const countOffer = Number.parseInt(count, 10) || COUNT.MIN;
 
     if (countOffer > COUNT.MAX) {
-      console.error(`No more than ${COUNT.MAX} publications`);
+      console.error(chalk.red(`No more than ${COUNT.MAX} publications`));
       process.exit(EXIT_CODE.UNCAUGHT_FATAL_EXCEPTION);
     }
 
     const content = JSON.stringify(generateOffers(countOffer));
-    fs.writeFile(FILE_NAME, content, (err) => {
-      if (err) {
-        console.error(`Can't write data to file ${FILE_NAME}...`);
-        process.exit(EXIT_CODE.UNCAUGHT_FATAL_EXCEPTION);
-      }
 
-      console.info(`Operation success. File ${FILE_NAME} created.`);
+    try {
+      await fs.writeFile(FILE_NAME, content);
+
+      console.info(chalk.green(`Operation success. File ${FILE_NAME} created.`));
       process.exit(EXIT_CODE.SUCCESS);
-    });
+    } catch (err) {
+      console.error(chalk.red(`Can't write data to file ${FILE_NAME}.`));
+      console.error(chalk.red(`${err.message}`));
+      process.exit(EXIT_CODE.UNCAUGHT_FATAL_EXCEPTION);
+    }
   }
 };
