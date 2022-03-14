@@ -1,0 +1,21 @@
+block variables
+  - let isAuthorized = false;
+  - let bodyClasses = ['wrapper'];
+
+doctype html
+html(lang="ru")
+  block head
+    include /partials/head
+
+  body
+    div(class=bodyClasses)
+      block header
+        include /partials/header
+
+      block content
+
+      block footer
+        include /partials/footer
+
+    block scripts
+      include /partials/scripts
