@@ -2,7 +2,8 @@
 
 const fs = require(`fs`).promises;
 const chalk = require(`chalk`);
-const {EXIT_CODE} = require(`../../constants`);
+const {nanoid} = require(`nanoid`);
+const {EXIT_CODE, MAX_ID_LENGTH} = require(`../../constants`);
 const {shuffle, getRandomInt, getRandomDate, formatDate} = require(`../../utils`);
 
 const COUNT = {
@@ -14,6 +15,7 @@ const FILE_MOCK = `mock.json`;
 const FILE_TITLES_PATH = `./data/titles.txt`;
 const FILE_CATEGORIES_PATH = `./data/categories.txt`;
 const FILE_SENTENCES_PATH = `./data/sentences.txt`;
+const FILE_COMMENTS_PATH = `./data/comments.txt`;
 
 const readContent = async (filePath) => {
   try {
@@ -27,9 +29,9 @@ const readContent = async (filePath) => {
 
 const generateTitle = (titles) => titles[getRandomInt(0, titles.length - 1)];
 
-const generateAnnounce = (sentences) => shuffle(sentences).slice(0, getRandomInt(1, 5)).join(` `);
+const generateAnnounce = (count = 1, sentences) => shuffle(sentences).slice(0, count - 1).join(` `);
 
-const genereteFullText = (sentences) => shuffle(sentences).slice(0, getRandomInt(1, sentences.length)).join(` `);
+const genereteFullText = (count = 1, sentences) => shuffle(sentences).slice(0, getRandomInt(1, count - 1)).join(` `);
 
 const generateDate = () => {
   const today = new Date();
@@ -38,15 +40,26 @@ const generateDate = () => {
   return formatDate(getRandomDate(new Date(nMonthsAgo), today));
 };
 
-const generateCategory = (categories) => shuffle(categories).slice(0, getRandomInt(1, categories.length - 1));
+const generateCategory = (count = 1, categories) => shuffle(categories).slice(0, getRandomInt(1, count - 1));
 
-const generateOffers = (count, titles, categories, sentences) => {
+const generateComments = (count = 1, comments) => {
+  return Array(getRandomInt(1, count)).fill({}).map(() => {
+    return {
+      id: nanoid(MAX_ID_LENGTH),
+      text: shuffle(comments).slice(0, getRandomInt(1, count - 1)).join(` `),
+    };
+  });
+};
+
+const generateOffers = (count, titles, categories, sentences, comments) => {
   return Array(count).fill({}).map(() => {
     return {
+      id: nanoid(MAX_ID_LENGTH),
       title: generateTitle(titles),
-      announce: generateAnnounce(sentences),
-      fullText: genereteFullText(sentences),
-      category: generateCategory(categories),
+      announce: generateAnnounce(getRandomInt(1, 5), sentences),
+      fullText: genereteFullText(sentences.length, sentences),
+      category: generateCategory(categories.length, categories),
+      comments: generateComments(getRandomInt(1, 5), comments),
       createdDate: generateDate(),
     };
   });
@@ -66,8 +79,9 @@ module.exports = {
     const titles = await readContent(FILE_TITLES_PATH);
     const categories = await readContent(FILE_CATEGORIES_PATH);
     const sentences = await readContent(FILE_SENTENCES_PATH);
+    const comments = await readContent(FILE_COMMENTS_PATH);
 
-    const content = JSON.stringify(generateOffers(countOffer, titles, categories, sentences));
+    const content = JSON.stringify(generateOffers(countOffer, titles, categories, sentences, comments));
 
     try {
       await fs.writeFile(FILE_MOCK, content);

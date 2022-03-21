@@ -12,3 +12,5 @@ module.exports.HTTP_CODE = {
   FORBIDDEN: 403,
   UNAUTHORIZED: 401,
 };
+
+module.exports.MAX_ID_LENGTH = 6;
