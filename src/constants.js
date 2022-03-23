@@ -17,3 +17,5 @@ module.exports.HTTP_CODE = {
 };
 
 module.exports.MAX_ID_LENGTH = 6;
+
+module.exports.API_PREFIX = `/api`;
