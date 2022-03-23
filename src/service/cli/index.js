@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 const help = require(`./help`);
 const generate = require(`./generate`);
@@ -9,9 +9,9 @@ const Cli = {
   [help.name]: help,
   [generate.name]: generate,
   [version.name]: version,
-  [server.name]: server
+  [server.name]: server,
 };
 
 module.exports = {
-  Cli
+  Cli,
 };

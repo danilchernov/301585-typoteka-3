@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 const articleValidator = require(`./article/validator`);
 const articleExist = require(`./article/exist`);
@@ -9,5 +9,5 @@ module.exports = {
   articleValidator,
   articleExist,
   commentValidator,
-  commentExist
+  commentExist,
 };

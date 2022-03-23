@@ -1,13 +1,15 @@
-'use strict';
+"use strict";
 
-const {HTTP_CODE} = require(`../../../constants`);
+const { HTTP_CODE } = require(`../../../constants`);
 
 module.exports = (service) => async (req, res, next) => {
-  const {articleId} = req.params;
+  const { articleId } = req.params;
   const article = await service.findOne(articleId);
 
   if (!article) {
-    return res.status(HTTP_CODE.NOT_FOUND).send(`Article with id "${articleId}" not found`);
+    return res
+      .status(HTTP_CODE.NOT_FOUND)
+      .send(`Article with id "${articleId}" not found`);
   }
 
   res.locals.article = article;

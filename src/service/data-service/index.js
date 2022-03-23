@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 const CategoryService = require(`./category`);
 const ArticleService = require(`./article`);
@@ -9,5 +9,5 @@ module.exports = {
   CategoryService,
   ArticleService,
   CommentService,
-  SearchService
+  SearchService,
 };

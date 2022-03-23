@@ -1,12 +1,17 @@
-'use strict';
+"use strict";
 
-const {Router} = require(`express`);
+const { Router } = require(`express`);
 
 const categories = require(`./categories`);
 const articles = require(`./articles`);
 const search = require(`./search`);
 
-const {CategoryService, ArticleService, CommentService, SearchService} = require(`../data-service`);
+const {
+  CategoryService,
+  ArticleService,
+  CommentService,
+  SearchService,
+} = require(`../data-service`);
 
 const getMockData = require(`../lib/get-mock-data`);
 

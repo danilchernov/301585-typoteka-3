@@ -6,3 +6,10 @@ env:
   node: true
 
 extends: "htmlacademy/node"
+
+rules:
+  object-curly-spacing: "off"
+  indent:
+    - 2
+    - 2
+    - SwitchCase: 1
