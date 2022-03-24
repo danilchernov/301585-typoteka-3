@@ -70,7 +70,7 @@ const generateComments = (count = 1, comments) => {
     });
 };
 
-const generateOffers = (count, titles, categories, sentences, comments) => {
+const generateArticles = (count, titles, categories, sentences, comments) => {
   return Array(count)
     .fill({})
     .map(() => {
@@ -103,7 +103,7 @@ module.exports = {
     const comments = await readContent(FILE_COMMENTS_PATH);
 
     const content = JSON.stringify(
-      generateOffers(countOffer, titles, categories, sentences, comments)
+      generateArticles(countOffer, titles, categories, sentences, comments)
     );
 
     try {
