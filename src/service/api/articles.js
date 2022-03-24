@@ -10,8 +10,8 @@ const {
 } = require(`../middlewares`);
 const route = new Router();
 
-module.exports = (app, articleService, commentService) => {
-  app.use(`/articles`, route);
+module.exports = (api, articleService, commentService) => {
+  api.use(`/articles`, route);
 
   route.get(
     `/:articleId/comments`,

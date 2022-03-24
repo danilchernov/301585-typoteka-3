@@ -2,7 +2,7 @@
 
 const express = require(`express`);
 const chalk = require(`chalk`);
-const routes = require(`../api`);
+const api = require(`../api`);
 
 const { EXIT_CODE, HTTP_CODE, API_PREFIX } = require(`../../constants`);
 
@@ -18,7 +18,7 @@ module.exports = {
       const app = express();
 
       app.use(express.json());
-      app.use(API_PREFIX, await routes());
+      app.use(API_PREFIX, api);
       app.use((req, res) => res.status(HTTP_CODE.NOT_FOUND).send(`Not found`));
 
       app.listen(port, () =>

@@ -4,8 +4,8 @@ const { Router } = require(`express`);
 const { HTTP_CODE } = require(`../../constants`);
 const route = new Router();
 
-module.exports = (app, service) => {
-  app.use(`/search`, route);
+module.exports = (api, service) => {
+  api.use(`/search`, route);
 
   route.get(`/`, async (req, res) => {
     const { query } = req.query;

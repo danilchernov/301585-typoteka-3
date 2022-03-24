@@ -15,13 +15,15 @@ const {
 
 const getMockData = require(`../lib/get-mock-data`);
 
-const app = new Router();
+const api = new Router();
 
-module.exports = async () => {
+(async () => {
   const mockData = await getMockData();
-  categories(app, new CategoryService(mockData));
-  articles(app, new ArticleService(mockData), new CommentService());
-  search(app, new SearchService(mockData));
+  categories(api, new CategoryService(mockData));
+  articles(api, new ArticleService(mockData), new CommentService());
+  search(api, new SearchService(mockData));
 
-  return app;
-};
+  return api;
+})();
+
+module.exports = api;
