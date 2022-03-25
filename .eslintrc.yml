@@ -5,4 +5,11 @@ env:
   es6: true
   node: true
 
-extends: "htmlacademy/node"
+extends: ["prettier", "htmlacademy/node"]
+
+plugins: ["prettier"]
+
+rules:
+  "prettier/prettier": "error"
+  object-curly-spacing: "off"
+  indent: "off"

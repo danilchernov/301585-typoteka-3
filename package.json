@@ -7,7 +7,11 @@
     "start": "nodemon ./src/service/service.js --server 3000",
     "start-front-server": "nodemon ./src/express/express",
     "test": "npm run eslint",
-    "eslint": "eslint --ext .js src/"
+    "eslint": "eslint --ext .js src/",
+    "eslint:fix": "npm run eslint -- --fix",
+    "prettier": "prettier  src/ --check",
+    "prettier:fix": "npm run prettier -- --write",
+    "format": "npm run prettier:fix && npm run eslint:fix"
   },
   "repository": {
     "type": "git",
@@ -22,12 +26,16 @@
   "devDependencies": {
     "eslint": "8.9.0",
     "eslint-config-htmlacademy": "0.6.0",
+    "eslint-config-prettier": "8.5.0",
+    "eslint-plugin-prettier": "4.0.0",
+    "prettier": "2.6.1",
     "pug-lint": "2.6.0"
   },
   "dependencies": {
     "chalk": "4.1.2",
     "command-line-usage": "6.1.1",
     "express": "4.17.3",
+    "nanoid": "3.3.1",
     "nodemon": "2.0.15",
     "pug": "3.0.2"
   }
