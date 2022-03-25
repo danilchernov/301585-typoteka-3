@@ -4,10 +4,11 @@ parserOptions:
 env:
   es6: true
   node: true
+  "jest/globals": true
 
 extends: ["prettier", "htmlacademy/node"]
 
-plugins: ["prettier"]
+plugins: ["prettier", "jest"]
 
 rules:
   "prettier/prettier": "error"
