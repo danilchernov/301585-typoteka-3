@@ -1,7 +1,7 @@
 "use strict";
 
 const { Router } = require(`express`);
-const { HTTP_CODE } = require(`../../constants`);
+const { HTTP_CODE } = require(`../../../constants`);
 const route = new Router();
 
 module.exports = (api, service) => {
