@@ -115,7 +115,7 @@ const app = express();
 app.use(express.json());
 search(app, new DataService(mockData));
 
-describe(`API returns an array of articles based on search query`, () => {
+describe(`API returns a list of articles based on search query`, () => {
   let response;
 
   beforeAll(async () => {
@@ -137,4 +137,8 @@ describe(`API returns an array of articles based on search query`, () => {
     const [article] = response.body;
     expect(article.id).toBe(CORRECT_ID);
   });
+});
+
+test(`API returns code 400 when query string is absent`, async () => {
+  await request(app).get(`/search`).expect(HTTP_CODE.BAD_REQUEST);
 });
