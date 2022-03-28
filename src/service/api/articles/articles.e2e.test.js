@@ -133,7 +133,7 @@ describe(`API changes an existing article`, () => {
   test(`Should return article with expected title`, () => {
     const EXPECTED_TITLE = mockValidArticle.title;
 
-    request(app)
+    return request(app)
       .get(`/articles/${mockArticleId}`)
       .expect((res) => expect(res.body.title).toBe(EXPECTED_TITLE));
   });
@@ -143,7 +143,7 @@ test(`API returns status code 404 when trying to change non-existent article`, (
   const app = createAPI();
 
   return request(app)
-    .put(`/articles/NOEXST`)
+    .put(`/articles/NOEXIST`)
     .send(mockValidArticle)
     .expect(HTTP_CODE.NOT_FOUND);
 });
@@ -151,7 +151,7 @@ test(`API returns status code 404 when trying to change non-existent article`, (
 test(`API returns status code 400 when trying to change an article with invalid data`, () => {
   const app = createAPI();
 
-  request(app)
+  return request(app)
     .put(`/articles/${mockArticleId}`)
     .send(mockInvalidData)
     .expect(HTTP_CODE.BAD_REQUEST);
@@ -183,5 +183,5 @@ describe(`API correctly deletes an article`, () => {
 
 test(`API returns status code 404 when trying to delete non-existent article`, () => {
   const app = createAPI();
-  return request(app).delete(`/articles/NOEXST`).expect(HTTP_CODE.NOT_FOUND);
+  return request(app).delete(`/articles/NOEXIST`).expect(HTTP_CODE.NOT_FOUND);
 });
