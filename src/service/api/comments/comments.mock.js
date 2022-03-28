@@ -92,5 +92,9 @@ module.exports.mockArticleId = `yVke0d`;
 module.exports.mockCommentId = `N3Ve68`;
 
 module.exports.mockValidComment = {
+  text: `Как достигнуть успеха не вставая с кресла?`,
+};
+
+module.exports.mockInvalidComment = {
   title: `Как достигнуть успеха не вставая с кресла?`,
 };
