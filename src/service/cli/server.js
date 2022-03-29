@@ -1,12 +1,35 @@
 "use strict";
 
 const express = require(`express`);
-const chalk = require(`chalk`);
 const api = require(`../api`);
 
+const { getLogger } = require(`../lib/logger`);
 const { EXIT_CODE, HTTP_CODE, API_PREFIX } = require(`../../constants`);
-
 const DEFAULT_PORT = 3000;
+
+const app = express();
+const logger = getLogger({ name: `api` });
+
+app.use(express.json());
+
+app.use((req, res, next) => {
+  logger.debug(`Request on route ${req.url}`);
+  res.on(`finish`, () => {
+    logger.info(`Response status code ${res.statusCode}`);
+  });
+  return next();
+});
+
+app.use(API_PREFIX, api);
+
+app.use((req, res) => {
+  res.status(HTTP_CODE.NOT_FOUND).send(`Not found`);
+  logger.error(`Route not found: ${req.url}`);
+});
+
+app.use((err, _req, _res, _next) => {
+  logger.error(`An error occurred on processing request: ${err.message}`);
+});
 
 module.exports = {
   name: `--server`,
@@ -15,21 +38,17 @@ module.exports = {
       const [customPort] = args;
       const port = Number.parseInt(customPort, 10) || DEFAULT_PORT;
 
-      const app = express();
+      app.listen(port, (err) => {
+        if (err) {
+          return logger.error(
+            `An error occurred on server creation: ${err.message}`
+          );
+        }
 
-      app.use(express.json());
-      app.use(API_PREFIX, api);
-      app.use((req, res) => res.status(HTTP_CODE.NOT_FOUND).send(`Not found`));
-
-      app.listen(port, () =>
-        console.info(chalk.green(`Waiting for connection on port: ${port}`))
-      );
+        return logger.info(`Listening to connections on ${port}`);
+      });
     } catch (err) {
-      console.error(
-        chalk.red(
-          `An error occurred while initializing the server: ${err.message}`
-        )
-      );
+      logger.error(`An error occurred: ${err.message}`);
       process.exit(EXIT_CODE.UNCAUGHT_FATAL_EXCEPTION);
     }
   },

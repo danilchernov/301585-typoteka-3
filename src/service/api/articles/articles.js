@@ -1,11 +1,11 @@
 "use strict";
 
 const { Router } = require(`express`);
-const { HTTP_CODE } = require(`../../constants`);
-const { articleValidator, articleExist } = require(`../middlewares`);
-const route = new Router();
+const { HTTP_CODE } = require(`../../../constants`);
+const { articleValidator, articleExist } = require(`../../middlewares`);
 
 module.exports = (api, articleService, commentsRouter) => {
+  const route = new Router();
   api.use(`/articles`, route);
 
   route.use(

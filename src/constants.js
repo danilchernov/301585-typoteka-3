@@ -1,5 +1,10 @@
 "use strict";
 
+module.exports.ENV = {
+  DEVELOPMENT: `development`,
+  PRODUCTION: `production`,
+};
+
 module.exports.EXIT_CODE = {
   SUCCESS: 0,
   UNCAUGHT_FATAL_EXCEPTION: 1,

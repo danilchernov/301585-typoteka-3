@@ -2,10 +2,10 @@
 
 const { Router } = require(`express`);
 
-const categories = require(`./categories`);
-const articles = require(`./articles`);
-const comments = require(`./comments`);
-const search = require(`./search`);
+const categories = require(`./categories/categories`);
+const articles = require(`./articles/articles`);
+const comments = require(`./comments/comments`);
+const search = require(`./search/search`);
 
 const {
   CategoryService,
