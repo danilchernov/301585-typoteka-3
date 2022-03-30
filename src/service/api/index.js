@@ -16,17 +16,17 @@ const {
 
 const getMockData = require(`../lib/get-mock-data`);
 
-const api = new Router();
+const app = new Router();
 
 (async () => {
   const mockData = await getMockData();
   const articlesCommentsRouter = comments(new CommentService());
 
-  categories(api, new CategoryService(mockData));
-  articles(api, new ArticleService(mockData), articlesCommentsRouter);
-  search(api, new SearchService(mockData));
+  categories(app, new CategoryService(mockData));
+  articles(app, new ArticleService(mockData), articlesCommentsRouter);
+  search(app, new SearchService(mockData));
 
-  return api;
+  return app;
 })();
 
-module.exports = api;
+module.exports = app;
