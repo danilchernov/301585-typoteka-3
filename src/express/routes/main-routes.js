@@ -1,10 +1,14 @@
 "use strict";
 
 const { Router } = require(`express`);
+const { getApi } = require(`../api`);
 const mainRoutes = new Router();
 
-mainRoutes.get(`/`, (req, res) => {
-  return res.render(`views/main/index`);
+const api = getApi();
+
+mainRoutes.get(`/`, async (req, res) => {
+  const articles = await api.getArticles();
+  return res.render(`views/main/index`, { articles });
 });
 
 mainRoutes.get(`/register`, (req, res) => {
