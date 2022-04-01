@@ -33,11 +33,11 @@ class API {
   }
 
   async getCategories() {
-    return await this.load(`/category`);
+    return await this._load(`/categories`);
   }
 
   async createArticle(data) {
-    return await this.load(`/articles`, {
+    return await this._load(`/articles`, {
       method: `POST`,
       data,
     });
