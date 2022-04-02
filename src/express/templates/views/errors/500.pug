@@ -9,7 +9,7 @@ block header
       img(src='img/icons/logo.svg' alt='логотип Тайпотеки')
     a.header__registration(href='#') Регистрация
     a.header__enter(href='#') Вход с паролем
-    a.header__search.button.button--search(href='#' aria-label='поиск по сайту')
+    a.header__search.button.button--search(href='/search' aria-label='поиск по сайту')
 
 block content
   main
@@ -19,4 +19,4 @@ block content
       p.error__text.text.text--big
         | Причин может быть много: сервер не выдержал нагрузку или в коде ошибка.
         | Попробуйте повторить попытку позже.
-      a.error__link.text.text--big(href='main.html') Вернуться на главную
+      a.error__link.text.text--big(href='/') Вернуться на главную

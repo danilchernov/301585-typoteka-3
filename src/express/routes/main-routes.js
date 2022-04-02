@@ -19,8 +19,14 @@ mainRoutes.get(`/login`, (req, res) => {
   return res.render(`views/main/login`);
 });
 
-mainRoutes.get(`/search`, (req, res) => {
-  return res.render(`views/main/search`);
+mainRoutes.get(`/search`, async (req, res) => {
+  try {
+    const { query } = req.query;
+    const results = await api.search(query);
+    res.render(`views/main/search`, { searchText: query, results });
+  } catch (error) {
+    res.render(`views/main/search`, { searchText: ``, results: [] });
+  }
 });
 
 module.exports = mainRoutes;

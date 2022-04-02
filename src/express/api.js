@@ -29,7 +29,7 @@ class API {
   }
 
   async search(query) {
-    return await this._load(`/search`, { params: query });
+    return await this._load(`/search`, { params: { query } });
   }
 
   async getCategories() {

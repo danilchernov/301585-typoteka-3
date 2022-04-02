@@ -14,7 +14,7 @@ module.exports = (api, service) => {
       return res.status(HTTP_CODE.BAD_REQUEST).send(`Bad request`);
     }
 
-    const articles = service.findAll(query);
+    const articles = await service.findAll(query);
 
     return res.status(HTTP_CODE.OK).json(articles);
   });
