@@ -44,3 +44,6 @@ module.exports.formatDate = (date) => {
     ].join(`:`)
   );
 };
+
+module.exports.ensureArray = (value) =>
+  Array.isArray(value) ? value : [value];
