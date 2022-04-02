@@ -18,6 +18,7 @@ const COUNT = {
 
 const FILE_MOCK = `mock.json`;
 const FILE_TITLES_PATH = `./data/titles.txt`;
+const FILE_IMAGES_PATH = `./data/images.txt`;
 const FILE_CATEGORIES_PATH = `./data/categories.txt`;
 const FILE_SENTENCES_PATH = `./data/sentences.txt`;
 const FILE_COMMENTS_PATH = `./data/comments.txt`;
@@ -39,6 +40,8 @@ const generateAnnounce = (count = 1, sentences) => {
     .slice(0, count - 1)
     .join(` `);
 };
+
+const generateImage = (images) => images[getRandomInt(0, images.length - 1)];
 
 const genereteFullText = (count = 1, sentences) => {
   return shuffle(sentences)
@@ -70,7 +73,14 @@ const generateComments = (count = 1, comments) => {
     });
 };
 
-const generateArticles = (count, titles, categories, sentences, comments) => {
+const generateArticles = (
+  count,
+  titles,
+  categories,
+  images,
+  sentences,
+  comments
+) => {
   return Array(count)
     .fill({})
     .map(() => {
@@ -78,8 +88,9 @@ const generateArticles = (count, titles, categories, sentences, comments) => {
         id: nanoid(MAX_ID_LENGTH),
         title: generateTitle(titles),
         announce: generateAnnounce(getRandomInt(1, 5), sentences),
+        image: generateImage(images),
         fullText: genereteFullText(sentences.length, sentences),
-        category: generateCategory(categories.length, categories),
+        category: generateCategory(getRandomInt(3, 5), categories),
         comments: generateComments(getRandomInt(1, 5), comments),
         createdDate: generateDate(),
       };
@@ -99,11 +110,19 @@ module.exports = {
 
     const titles = await readContent(FILE_TITLES_PATH);
     const categories = await readContent(FILE_CATEGORIES_PATH);
+    const images = await readContent(FILE_IMAGES_PATH);
     const sentences = await readContent(FILE_SENTENCES_PATH);
     const comments = await readContent(FILE_COMMENTS_PATH);
 
     const content = JSON.stringify(
-      generateArticles(countOffer, titles, categories, sentences, comments)
+      generateArticles(
+        countOffer,
+        titles,
+        categories,
+        images,
+        sentences,
+        comments
+      )
     );
 
     try {

@@ -20,9 +20,9 @@ module.exports = (api, articleService, commentsRouter) => {
   });
 
   route.post(`/`, articleValidator, async (req, res) => {
-    const offer = await articleService.create(req.body);
+    const article = await articleService.create(req.body);
 
-    return res.status(HTTP_CODE.CREATED).json(offer);
+    return res.status(HTTP_CODE.CREATED).json(article);
   });
 
   route.get(`/:articleId`, articleExist(articleService), async (req, res) => {

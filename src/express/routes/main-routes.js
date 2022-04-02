@@ -1,10 +1,14 @@
 "use strict";
 
 const { Router } = require(`express`);
+const { getApi } = require(`../api`);
 const mainRoutes = new Router();
 
-mainRoutes.get(`/`, (req, res) => {
-  return res.render(`views/main/index`);
+const api = getApi();
+
+mainRoutes.get(`/`, async (req, res) => {
+  const articles = await api.getArticles();
+  return res.render(`views/main/index`, { articles });
 });
 
 mainRoutes.get(`/register`, (req, res) => {
@@ -15,8 +19,14 @@ mainRoutes.get(`/login`, (req, res) => {
   return res.render(`views/main/login`);
 });
 
-mainRoutes.get(`/search`, (req, res) => {
-  return res.render(`views/main/search`);
+mainRoutes.get(`/search`, async (req, res) => {
+  try {
+    const { query } = req.query;
+    const results = await api.search(query);
+    res.render(`views/main/search`, { searchText: query, results });
+  } catch (error) {
+    res.render(`views/main/search`, { searchText: ``, results: [] });
+  }
 });
 
 module.exports = mainRoutes;
