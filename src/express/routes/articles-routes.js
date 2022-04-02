@@ -37,13 +37,18 @@ articlesRoutes.post(`/add`, upload.single(`upload`), async (req, res) => {
   }
 });
 
-articlesRoutes.get(`/edit/:id`, async (req, res) => {
+articlesRoutes.get(`/edit/:id`, async (req, res, next) => {
   const { id } = req.params;
-  const [article, categories] = await Promise.all([
-    api.getArticle(id),
-    api.getCategories(),
-  ]);
-  return res.render(`views/articles/editor`, { article, categories });
+
+  try {
+    const [article, categories] = await Promise.all([
+      api.getArticle(id),
+      api.getCategories(),
+    ]);
+    return res.render(`views/articles/editor`, { article, categories });
+  } catch (err) {
+    return next(err);
+  }
 });
 
 articlesRoutes.get(`/:id`, (req, res) => {

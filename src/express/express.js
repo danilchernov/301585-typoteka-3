@@ -2,6 +2,7 @@
 
 const path = require(`path`);
 const express = require(`express`);
+const { HTTP_CODE } = require(`../constants`);
 
 const mainRoutes = require(`./routes/main-routes`);
 const articlesRoutes = require(`./routes/articles-routes`);
@@ -22,5 +23,10 @@ app.use(express.static(path.resolve(__dirname, UPLOAD_DIR)));
 app.use(`/`, mainRoutes);
 app.use(`/articles`, articlesRoutes);
 app.use(`/my`, myRoutes);
-
+app.use((req, res) =>
+  res.status(HTTP_CODE.NOT_FOUND).render(`views/errors/404`)
+);
+app.use((err, _req, res, _next) => {
+  res.status(HTTP_CODE.INTERNAL_SERVER_ERROR).render(`views/errors/500`);
+});
 app.listen(DEFAULT_PORT);
