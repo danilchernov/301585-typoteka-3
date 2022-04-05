@@ -14,7 +14,7 @@
     "start-back-server": "cross-env LOG_LEVEL=error node ./src/service/service.js --server",
     "start-back-server::debug": "cross-env LOG_LEVEL=info NODE_ENV=development nodemon ./src/service/service.js --server",
     "start-front-server": "node ./src/express/express",
-    "start-front-server::debug": "nodemon ./src/express/express"
+    "start::parallel": "concurrently \"npm run start-back-server::debug\" \"npm run start-front-server\""
   },
   "repository": {
     "type": "git",
@@ -42,6 +42,7 @@
     "axios": "0.26.1",
     "chalk": "4.1.2",
     "command-line-usage": "6.1.1",
+    "concurrently": "7.1.0",
     "cross-env": "7.0.3",
     "express": "4.17.3",
     "multer": "1.4.4",
