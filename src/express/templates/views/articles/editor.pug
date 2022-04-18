@@ -28,10 +28,10 @@ block content
                     input(type='text' name='title' placeholder='Заголовок' required value=`${article ? article.title : ''}`)
                 .form__field.form__field--post-image
                   label
-                    input#image-name-field(type='text' name='photo' placeholder='Фотография' readonly value=`${article && article.image ? article.image : ''}`)
+                    input#image-name-field(type='text' name='photo' placeholder='Фотография' readonly required value=`${article && article.image ? article.image : ''}`)
                   .form__image-loader.form__image-loader--publication
                     label
-                      input.visually-hidden(type='file' name='upload')
+                      input.visually-hidden(type='file' name='upload' required)
                       | Обзор
                   if article && article.image
                     button.button.button--transparent Удалить
