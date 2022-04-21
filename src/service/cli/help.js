@@ -36,6 +36,11 @@ const generateUsageInformation = () => {
           typeLabel: `{underline port}`,
           description: `Starts the API server on the specified {underline port}. If the port is not specified, then the {bold 3000} will be selected.`,
         },
+        {
+          name: `fill`,
+          typeLabel: `{underline count}`,
+          description: `Generates the {bold fill-db.sql} file. The file describes {underline count} SQL queries to create the necessary fake data.`,
+        },
       ],
     },
   ];
