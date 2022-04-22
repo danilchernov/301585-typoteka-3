@@ -4,7 +4,7 @@ const fs = require(`fs`).promises;
 const chalk = require(`chalk`);
 const { nanoid } = require(`nanoid`);
 
-const { EXIT_CODE, MAX_ID_LENGTH } = require(`../../constants`);
+const { ExitCode, MAX_ID_LENGTH } = require(`../../constants`);
 const {
   shuffle,
   getRandomInt,
@@ -19,27 +19,27 @@ const FILE_CATEGORIES_PATH = `./data/categories.txt`;
 const FILE_SENTENCES_PATH = `./data/sentences.txt`;
 const FILE_COMMENTS_PATH = `./data/comments.txt`;
 
-const ARTICLE_LIMIT = {
+const ArticleLimit = {
   MIN: 1,
   MAX: 1000,
 };
 
-const ANNOUNCE_LIMIT = {
+const AnnounceLimit = {
   MIN: 1,
   MAX: 3,
 };
 
-const FULL_TEXT_LIMIT = {
+const FullTextLimit = {
   MIN: 5,
   MAX: 10,
 };
 
-const CATEGORY_LIMIT = {
+const CategoryLimit = {
   MIN: 3,
   MAX: 5,
 };
 
-const COMMENT_LIMIT = {
+const CommentLimit = {
   MIN: 3,
   MAX: 5,
 };
@@ -107,20 +107,20 @@ const generateArticles = (
         id: nanoid(MAX_ID_LENGTH),
         title: generateTitle(titles),
         announce: generateAnnounce(
-          getRandomInt(ANNOUNCE_LIMIT.MIN, ANNOUNCE_LIMIT.MAX),
+          getRandomInt(AnnounceLimit.MIN, AnnounceLimit.MAX),
           sentences
         ),
         image: generateImage(images),
         fullText: genereteFullText(
-          getRandomInt(FULL_TEXT_LIMIT.MIN, FULL_TEXT_LIMIT.MAX),
+          getRandomInt(FullTextLimit.MIN, FullTextLimit.MAX),
           sentences
         ),
         category: generateCategory(
-          getRandomInt(CATEGORY_LIMIT.MIN, CATEGORY_LIMIT.MAX),
+          getRandomInt(CategoryLimit.MIN, CategoryLimit.MAX),
           categories
         ),
         comments: generateComments(
-          getRandomInt(COMMENT_LIMIT.MIN, COMMENT_LIMIT.MAX),
+          getRandomInt(CommentLimit.MIN, CommentLimit.MAX),
           comments
         ),
         createdDate: generateDate(),
@@ -132,13 +132,11 @@ module.exports = {
   name: `--generate`,
   async run(args) {
     const [count] = args;
-    const countArticles = Number.parseInt(count, 10) || ARTICLE_LIMIT.MIN;
+    const countArticles = Number.parseInt(count, 10) || ArticleLimit.MIN;
 
-    if (countArticles > ARTICLE_LIMIT.MAX) {
-      console.error(
-        chalk.red(`No more than ${ARTICLE_LIMIT.MAX} publications`)
-      );
-      process.exit(EXIT_CODE.UNCAUGHT_FATAL_EXCEPTION);
+    if (countArticles > ArticleLimit.MAX) {
+      console.error(chalk.red(`No more than ${ArticleLimit.MAX} publications`));
+      process.exit(ExitCode.UNCAUGHT_FATAL_EXCEPTION);
     }
 
     const titles = await readContent(FILE_TITLES_PATH);
@@ -164,11 +162,11 @@ module.exports = {
       console.info(
         chalk.green(`Operation success. File ${FILE_NAME} created.`)
       );
-      process.exit(EXIT_CODE.SUCCESS);
+      process.exit(ExitCode.SUCCESS);
     } catch (err) {
       console.error(chalk.red(`Can't write data to file ${FILE_NAME}.`));
       console.error(chalk.red(`${err.message}`));
-      process.exit(EXIT_CODE.UNCAUGHT_FATAL_EXCEPTION);
+      process.exit(ExitCode.UNCAUGHT_FATAL_EXCEPTION);
     }
   },
 };

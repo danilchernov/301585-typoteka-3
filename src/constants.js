@@ -1,16 +1,16 @@
 "use strict";
 
-module.exports.ENV = {
+module.exports.Env = {
   DEVELOPMENT: `development`,
   PRODUCTION: `production`,
 };
 
-module.exports.EXIT_CODE = {
+module.exports.ExitCode = {
   SUCCESS: 0,
   UNCAUGHT_FATAL_EXCEPTION: 1,
 };
 
-module.exports.HTTP_CODE = {
+module.exports.HttpCode = {
   OK: 200,
   CREATED: 201,
   NO_CONTENT: 204,

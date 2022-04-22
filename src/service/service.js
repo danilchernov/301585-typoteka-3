@@ -2,7 +2,7 @@
 
 const { Cli } = require(`./cli`);
 
-const { EXIT_CODE } = require(`../constants`);
+const { ExitCode } = require(`../constants`);
 
 const DEFAULT_COMMAND = `--help`;
 const USER_ARGV_INDEX = 2;
@@ -12,7 +12,7 @@ const [userCommand] = userArguments;
 
 if (userArguments.length === 0 || !Cli[userCommand]) {
   Cli[DEFAULT_COMMAND].run();
-  process.exit(EXIT_CODE.SUCCESS);
+  process.exit(ExitCode.SUCCESS);
 }
 
 Cli[userCommand].run(userArguments.slice(1));

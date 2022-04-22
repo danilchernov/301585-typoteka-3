@@ -2,7 +2,7 @@
 
 const express = require(`express`);
 const request = require(`supertest`);
-const { HTTP_CODE } = require(`../../../constants`);
+const { HttpCode } = require(`../../../constants`);
 
 const articles = require(`./articles`);
 const comments = require(`../comments/comments`);
@@ -38,7 +38,7 @@ describe(`API returns a list of all articles`, () => {
   });
 
   test(`Should return status code 200`, () => {
-    expect(response.statusCode).toBe(HTTP_CODE.OK);
+    expect(response.statusCode).toBe(HttpCode.OK);
   });
 
   test(`Should return a list of 5 articles`, () => {
@@ -61,7 +61,7 @@ describe(`API returns an article with given id`, () => {
   });
 
   test(`Should return status code 200`, () => {
-    expect(response.statusCode).toBe(HTTP_CODE.OK);
+    expect(response.statusCode).toBe(HttpCode.OK);
   });
 
   test(`Should return an article with expected title`, () => {
@@ -80,7 +80,7 @@ describe(`API creates an article if the passed data is valid`, () => {
   });
 
   test(`Should return status code 201`, () => {
-    expect(response.statusCode).toBe(HTTP_CODE.CREATED);
+    expect(response.statusCode).toBe(HttpCode.CREATED);
   });
 
   test(`Should return the created article`, () => {
@@ -106,7 +106,7 @@ describe(`API does not create an article if the passed data is invalid`, () => {
       await request(app)
         .post(`/articles`)
         .send(badArticle)
-        .expect(HTTP_CODE.BAD_REQUEST);
+        .expect(HttpCode.BAD_REQUEST);
     }
   });
 });
@@ -123,7 +123,7 @@ describe(`API changes an existing article`, () => {
   });
 
   test(`Should return status code 200`, () => {
-    expect(response.statusCode).toBe(HTTP_CODE.OK);
+    expect(response.statusCode).toBe(HttpCode.OK);
   });
 
   test(`Should return updated article`, () => {
@@ -145,7 +145,7 @@ test(`API returns status code 404 when trying to change non-existent article`, (
   return request(app)
     .put(`/articles/NOEXIST`)
     .send(mockValidArticle)
-    .expect(HTTP_CODE.NOT_FOUND);
+    .expect(HttpCode.NOT_FOUND);
 });
 
 test(`API returns status code 400 when trying to change an article with invalid data`, () => {
@@ -154,7 +154,7 @@ test(`API returns status code 400 when trying to change an article with invalid 
   return request(app)
     .put(`/articles/${mockArticleId}`)
     .send(mockInvalidData)
-    .expect(HTTP_CODE.BAD_REQUEST);
+    .expect(HttpCode.BAD_REQUEST);
 });
 
 describe(`API correctly deletes an article`, () => {
@@ -167,7 +167,7 @@ describe(`API correctly deletes an article`, () => {
   });
 
   test(`Should return status code 200`, () => {
-    expect(response.statusCode).toBe(HTTP_CODE.OK);
+    expect(response.statusCode).toBe(HttpCode.OK);
   });
 
   test(`Should return deleted article`, () => {
@@ -183,5 +183,5 @@ describe(`API correctly deletes an article`, () => {
 
 test(`API returns status code 404 when trying to delete non-existent article`, () => {
   const app = createAPI();
-  return request(app).delete(`/articles/NOEXIST`).expect(HTTP_CODE.NOT_FOUND);
+  return request(app).delete(`/articles/NOEXIST`).expect(HttpCode.NOT_FOUND);
 });

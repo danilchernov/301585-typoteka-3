@@ -2,7 +2,7 @@
 
 const express = require(`express`);
 const request = require(`supertest`);
-const { HTTP_CODE } = require(`../../../constants`);
+const { HttpCode } = require(`../../../constants`);
 
 const search = require(`./search`);
 const DataService = require(`../../data-service/search`);
@@ -23,7 +23,7 @@ describe(`API returns a list of articles based on search query`, () => {
   });
 
   test(`Should return status code 200`, () => {
-    expect(response.statusCode).toBe(HTTP_CODE.OK);
+    expect(response.statusCode).toBe(HttpCode.OK);
   });
 
   test(`Should found 1 article`, () => {
@@ -38,4 +38,4 @@ describe(`API returns a list of articles based on search query`, () => {
 });
 
 test(`API returns code 400 when query string is absent`, async () =>
-  await request(app).get(`/search`).expect(HTTP_CODE.BAD_REQUEST));
+  await request(app).get(`/search`).expect(HttpCode.BAD_REQUEST));
