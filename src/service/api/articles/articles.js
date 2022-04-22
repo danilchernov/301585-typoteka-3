@@ -1,7 +1,7 @@
 "use strict";
 
 const { Router } = require(`express`);
-const { HTTP_CODE } = require(`../../../constants`);
+const { HttpCode } = require(`../../../constants`);
 const { articleValidator, articleExist } = require(`../../middlewares`);
 
 module.exports = (api, articleService, commentsRouter) => {
@@ -16,19 +16,19 @@ module.exports = (api, articleService, commentsRouter) => {
 
   route.get(`/`, async (req, res) => {
     const categories = await articleService.findAll();
-    return res.status(HTTP_CODE.OK).json(categories);
+    return res.status(HttpCode.OK).json(categories);
   });
 
   route.post(`/`, articleValidator, async (req, res) => {
     const article = await articleService.create(req.body);
 
-    return res.status(HTTP_CODE.CREATED).json(article);
+    return res.status(HttpCode.CREATED).json(article);
   });
 
   route.get(`/:articleId`, articleExist(articleService), async (req, res) => {
     const { article } = res.locals;
 
-    return res.status(HTTP_CODE.OK).json(article);
+    return res.status(HttpCode.OK).json(article);
   });
 
   route.put(
@@ -38,7 +38,7 @@ module.exports = (api, articleService, commentsRouter) => {
       const { article } = res.locals;
       const updatedArticle = await articleService.update(article.id, req.body);
 
-      return res.status(HTTP_CODE.OK).json(updatedArticle);
+      return res.status(HttpCode.OK).json(updatedArticle);
     }
   );
 
@@ -49,7 +49,7 @@ module.exports = (api, articleService, commentsRouter) => {
       const { article } = res.locals;
       const deletedArticle = await articleService.delete(article.id);
 
-      return res.status(HTTP_CODE.OK).json(deletedArticle);
+      return res.status(HttpCode.OK).json(deletedArticle);
     }
   );
 };

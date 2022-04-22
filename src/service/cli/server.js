@@ -4,7 +4,7 @@ const express = require(`express`);
 const api = require(`../api`);
 
 const { getLogger } = require(`../lib/logger`);
-const { EXIT_CODE, HTTP_CODE, API_PREFIX } = require(`../../constants`);
+const { ExitCode, HttpCode, API_PREFIX } = require(`../../constants`);
 const DEFAULT_PORT = 3000;
 
 const app = express();
@@ -23,7 +23,7 @@ app.use((req, res, next) => {
 app.use(API_PREFIX, api);
 
 app.use((req, res) => {
-  res.status(HTTP_CODE.NOT_FOUND).send(`Not found`);
+  res.status(HttpCode.NOT_FOUND).send(`Not found`);
   logger.error(`Route not found: ${req.url}`);
 });
 
@@ -49,7 +49,7 @@ module.exports = {
       });
     } catch (err) {
       logger.error(`An error occurred: ${err.message}`);
-      process.exit(EXIT_CODE.UNCAUGHT_FATAL_EXCEPTION);
+      process.exit(ExitCode.UNCAUGHT_FATAL_EXCEPTION);
     }
   },
 };

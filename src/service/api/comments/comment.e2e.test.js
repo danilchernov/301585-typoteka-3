@@ -2,7 +2,7 @@
 
 const express = require(`express`);
 const request = require(`supertest`);
-const { HTTP_CODE } = require(`../../../constants`);
+const { HttpCode } = require(`../../../constants`);
 
 const articles = require(`../articles/articles`);
 const comments = require(`./comments`);
@@ -39,7 +39,7 @@ describe(`API returns a list of comments for the specified article`, () => {
   });
 
   test(`Should return status code 200`, () => {
-    expect(response.statusCode).toBe(HTTP_CODE.OK);
+    expect(response.statusCode).toBe(HttpCode.OK);
   });
 
   test(`Should return a list of 2 comments`, () => {
@@ -57,7 +57,7 @@ test(`API returns status code 404 when trying to get a list of comments from a n
 
   return request(app)
     .get(`/articles/NOEXIST/comments/${mockCommentId}`)
-    .expect(HTTP_CODE.NOT_FOUND);
+    .expect(HttpCode.NOT_FOUND);
 });
 
 describe(`API creates an comment if the passed data is valid`, () => {
@@ -72,7 +72,7 @@ describe(`API creates an comment if the passed data is valid`, () => {
   });
 
   test(`Should return status code 200`, () => {
-    expect(response.statusCode).toBe(HTTP_CODE.CREATED);
+    expect(response.statusCode).toBe(HttpCode.CREATED);
   });
 
   test(`Should return the created comment`, () => {
@@ -91,7 +91,7 @@ test(`API returns status code 400 when trying to add a comment with invalid data
   return request(app)
     .post(`/articles/${mockArticleId}/comments`)
     .send(mockInvalidComment)
-    .expect(HTTP_CODE.BAD_REQUEST);
+    .expect(HttpCode.BAD_REQUEST);
 });
 
 test(`API returns status code 404 when trying to add a comment to a non-existent article`, () => {
@@ -100,7 +100,7 @@ test(`API returns status code 404 when trying to add a comment to a non-existent
   return request(app)
     .post(`/articles/NOEXIST/comments`)
     .send(mockValidComment)
-    .expect(HTTP_CODE.NOT_FOUND);
+    .expect(HttpCode.NOT_FOUND);
 });
 
 describe(`API correctly deletes a comment`, () => {
@@ -115,7 +115,7 @@ describe(`API correctly deletes a comment`, () => {
   });
 
   test(`Should return status code 200`, () =>
-    expect(response.statusCode).toBe(HTTP_CODE.OK));
+    expect(response.statusCode).toBe(HttpCode.OK));
 
   test(`Should return deleted comment`, () =>
     expect(response.body.id).toBe(mockCommentId));
@@ -131,7 +131,7 @@ test(`API returns status code 404 when trying to delete non-existent comment`, (
 
   return request(app)
     .delete(`/articles/${mockArticleId}/comments/NOEXIST`)
-    .expect(HTTP_CODE.NOT_FOUND);
+    .expect(HttpCode.NOT_FOUND);
 });
 
 test(`API returns 404 status code when trying to remove a comment from a non-existent article`, () => {
@@ -139,5 +139,5 @@ test(`API returns 404 status code when trying to remove a comment from a non-exi
 
   return request(app)
     .delete(`/articles/NOEXIST/comments/IuMBOc`)
-    .expect(HTTP_CODE.NOT_FOUND);
+    .expect(HttpCode.NOT_FOUND);
 });

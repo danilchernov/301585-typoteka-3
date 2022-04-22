@@ -2,7 +2,7 @@
 
 const express = require(`express`);
 const request = require(`supertest`);
-const { HTTP_CODE } = require(`../../../constants`);
+const { HttpCode } = require(`../../../constants`);
 
 const categories = require(`./categories`);
 const DataService = require(`../../data-service/category`);
@@ -21,7 +21,7 @@ describe(`API returns a list of categories`, () => {
   });
 
   test(`Should return status code 200`, () => {
-    expect(response.statusCode).toBe(HTTP_CODE.OK);
+    expect(response.statusCode).toBe(HttpCode.OK);
   });
 
   test(`Should return a list with 9 categories`, () => {
