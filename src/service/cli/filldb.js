@@ -2,9 +2,13 @@
 
 const fs = require(`fs`).promises;
 const chalk = require(`chalk`);
-const { nanoid } = require(`nanoid`);
 
-const { ExitCode, MAX_ID_LENGTH } = require(`../../constants`);
+const { getLogger } = require(`../lib/logger`);
+const sequelize = require(`../lib/sequelize`);
+const defineModels = require(`../models`);
+const Alias = require(`../models/alias`);
+
+const { ExitCode } = require(`../../constants`);
 const {
   shuffle,
   getRandomInt,
@@ -12,7 +16,8 @@ const {
   formatDate,
 } = require(`../../utils`);
 
-const FILE_NAME = `mock.json`;
+const logger = getLogger({ name: `api` });
+
 const FILE_TITLES_PATH = `./data/titles.txt`;
 const FILE_IMAGES_PATH = `./data/images.txt`;
 const FILE_CATEGORIES_PATH = `./data/categories.txt`;
@@ -86,7 +91,6 @@ const generateComments = (count = 1, comments) => {
     .fill({})
     .map(() => {
       return {
-        id: nanoid(MAX_ID_LENGTH),
         text: shuffle(comments).slice(0, getRandomInt(1, count)).join(` `),
       };
     });
@@ -104,7 +108,6 @@ const generateArticles = (
     .fill({})
     .map(() => {
       return {
-        id: nanoid(MAX_ID_LENGTH),
         title: generateTitle(titles),
         announce: generateAnnounce(
           getRandomInt(AnnounceLimit.MIN, AnnounceLimit.MAX),
@@ -115,7 +118,7 @@ const generateArticles = (
           getRandomInt(FullTextLimit.MIN, FullTextLimit.MAX),
           sentences
         ),
-        category: generateCategory(
+        categories: generateCategory(
           getRandomInt(CategoryLimit.MIN, CategoryLimit.MAX),
           categories
         ),
@@ -129,8 +132,17 @@ const generateArticles = (
 };
 
 module.exports = {
-  name: `--generate`,
+  name: `--filldb`,
   async run(args) {
+    try {
+      logger.info(`Trying to connect to database...`);
+      await sequelize.authenticate();
+    } catch (err) {
+      logger.error(`An error occurred: ${err.message}`);
+      process.exit(ExitCode.UNCAUGHT_FATAL_EXCEPTION);
+    }
+    logger.info(`Connection to database established`);
+
     const [count] = args;
     const countArticles = Number.parseInt(count, 10) || ArticleLimit.MIN;
 
@@ -139,34 +151,35 @@ module.exports = {
       process.exit(ExitCode.UNCAUGHT_FATAL_EXCEPTION);
     }
 
+    const { Category, Article } = defineModels(sequelize);
+
+    await sequelize.sync({ force: true });
+
     const titles = await readContent(FILE_TITLES_PATH);
     const categories = await readContent(FILE_CATEGORIES_PATH);
     const images = await readContent(FILE_IMAGES_PATH);
     const sentences = await readContent(FILE_SENTENCES_PATH);
     const comments = await readContent(FILE_COMMENTS_PATH);
-
-    const content = JSON.stringify(
-      generateArticles(
-        countArticles,
-        titles,
-        categories,
-        images,
-        sentences,
-        comments
-      )
+    const categoryModels = await Category.bulkCreate(
+      categories.map((item) => ({ name: item }))
     );
 
-    try {
-      await fs.writeFile(FILE_NAME, content);
+    const articles = generateArticles(
+      countArticles,
+      titles,
+      categoryModels,
+      images,
+      sentences,
+      comments
+    );
 
-      console.info(
-        chalk.green(`Operation success. File ${FILE_NAME} created.`)
-      );
-      process.exit(ExitCode.SUCCESS);
-    } catch (err) {
-      console.error(chalk.red(`Can't write data to file ${FILE_NAME}.`));
-      console.error(chalk.red(`${err.message}`));
-      process.exit(ExitCode.UNCAUGHT_FATAL_EXCEPTION);
-    }
+    const articlePromises = articles.map(async (article) => {
+      const articleModel = await Article.create(article, {
+        include: [Alias.COMMENTS],
+      });
+      await articleModel.addCategories(article.categories);
+    });
+
+    await Promise.all(articlePromises);
   },
 };

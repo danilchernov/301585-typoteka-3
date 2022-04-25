@@ -27,9 +27,9 @@ const generateUsageInformation = () => {
           type: Boolean,
         },
         {
-          name: `generate`,
+          name: `filldb`,
           typeLabel: `{underline count}`,
-          description: `Generates an array with test publications in the amount of {underline count} and saves them to the {bold mocks.json} file in the project root directory.`,
+          description: `Generates {underline count} articles and saves them to the database.`,
         },
         {
           name: `server`,
