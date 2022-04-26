@@ -2,6 +2,9 @@
 
 const { Router } = require(`express`);
 
+const defineModels = require(`../models`);
+const sequelize = require(`../lib/sequelize`);
+
 const categories = require(`./categories/categories`);
 const articles = require(`./articles/articles`);
 const comments = require(`./comments/comments`);
@@ -14,17 +17,15 @@ const {
   SearchService,
 } = require(`../data-service`);
 
-const getMockData = require(`../lib/get-mock-data`);
-
 const app = new Router();
 
-(async () => {
-  const mockData = await getMockData();
-  const articlesCommentsRouter = comments(new CommentService());
+defineModels(sequelize);
 
-  categories(app, new CategoryService(mockData));
-  articles(app, new ArticleService(mockData), articlesCommentsRouter);
-  search(app, new SearchService(mockData));
+(async () => {
+  const articlesCommentsRouter = comments(new CommentService(sequelize));
+  categories(app, new CategoryService(sequelize));
+  articles(app, new ArticleService(sequelize), articlesCommentsRouter);
+  search(app, new SearchService(sequelize));
 
   return app;
 })();
