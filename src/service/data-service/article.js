@@ -24,10 +24,10 @@ class ArticleService {
     return await this._Article.findByPk(id, { include: [Alias.CATEGORIES] });
   }
 
-  async findAll(needComments) {
+  async findAll({ comments } = {}) {
     const include = [Alias.CATEGORIES];
 
-    if (needComments) {
+    if (comments) {
       include.push(Alias.COMMENTS);
     }
 
