@@ -5,10 +5,10 @@ const chalk = require(`chalk`);
 
 const { getLogger } = require(`../lib/logger`);
 const sequelize = require(`../lib/sequelize`);
-const defineModels = require(`../models`);
-const Alias = require(`../models/alias`);
+const initDB = require(`../lib/init-db`);
 
 const { ExitCode } = require(`../../constants`);
+
 const {
   shuffle,
   getRandomInt,
@@ -82,7 +82,7 @@ const generateDate = () => {
   return formatDate(getRandomDate(new Date(nMonthsAgo), today));
 };
 
-const generateCategory = (count = 1, categories) => {
+const generateCategories = (count = 1, categories) => {
   return shuffle(categories).slice(0, count);
 };
 
@@ -118,7 +118,7 @@ const generateArticles = (
           getRandomInt(FullTextLimit.MIN, FullTextLimit.MAX),
           sentences
         ),
-        categories: generateCategory(
+        categories: generateCategories(
           getRandomInt(CategoryLimit.MIN, CategoryLimit.MAX),
           categories
         ),
@@ -151,35 +151,21 @@ module.exports = {
       process.exit(ExitCode.UNCAUGHT_FATAL_EXCEPTION);
     }
 
-    const { Category, Article } = defineModels(sequelize);
-
-    await sequelize.sync({ force: true });
-
     const titles = await readContent(FILE_TITLES_PATH);
     const categories = await readContent(FILE_CATEGORIES_PATH);
     const images = await readContent(FILE_IMAGES_PATH);
     const sentences = await readContent(FILE_SENTENCES_PATH);
     const comments = await readContent(FILE_COMMENTS_PATH);
-    const categoryModels = await Category.bulkCreate(
-      categories.map((item) => ({ name: item }))
-    );
 
     const articles = generateArticles(
       countArticles,
       titles,
-      categoryModels,
+      categories,
       images,
       sentences,
       comments
     );
 
-    const articlePromises = articles.map(async (article) => {
-      const articleModel = await Article.create(article, {
-        include: [Alias.COMMENTS],
-      });
-      await articleModel.addCategories(article.categories);
-    });
-
-    await Promise.all(articlePromises);
+    return initDB(sequelize, { articles, categories });
   },
 };
