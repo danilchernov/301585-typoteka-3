@@ -2,16 +2,28 @@
 
 const express = require(`express`);
 const request = require(`supertest`);
-const { HttpCode } = require(`../../../constants`);
+const Sequelize = require(`sequelize`);
 
+const initDB = require(`../../lib/init-db`);
 const categories = require(`./categories`);
 const DataService = require(`../../data-service/category`);
 
-const { mockData } = require(`./categories.mock`);
+const { HttpCode } = require(`../../../constants`);
+
+const { mockCategories, mockArticles } = require(`./categories.mock`);
+const mockDB = new Sequelize(`sqlite::memory:`, { logging: false });
 
 const app = express();
 app.use(express.json());
-categories(app, new DataService(mockData));
+
+beforeAll(async () => {
+  await initDB(mockDB, {
+    categories: mockCategories,
+    articles: mockArticles,
+  });
+
+  categories(app, new DataService(mockDB));
+});
 
 describe(`API returns a list of categories`, () => {
   let response;
@@ -41,7 +53,7 @@ describe(`API returns a list of categories`, () => {
       `Разное`,
     ];
 
-    expect(response.body).toEqual(
+    expect(response.body.map((it) => it.name)).toEqual(
       expect.arrayContaining(EXPECTED_CATEGORIES_TITLES)
     );
   });
