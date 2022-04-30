@@ -2,38 +2,43 @@
 
 const express = require(`express`);
 const request = require(`supertest`);
-const { HttpCode } = require(`../../../constants`);
+const Sequelize = require(`sequelize`);
 
+const initDB = require(`../../lib/init-db`);
 const articles = require(`./articles`);
 const comments = require(`../comments/comments`);
-
 const DataService = require(`../../data-service/article`);
 const CommentService = require(`../../data-service/comment`);
 
+const { HttpCode } = require(`../../../constants`);
+
 const {
-  mockData,
+  mockCategories,
+  mockArticles,
   mockArticleId,
   mockValidArticle,
-  mockInvalidData,
+  mockInvalidArticle,
 } = require(`./articles.mock`);
 
-const createAPI = () => {
+const createApi = async () => {
+  const mockDB = new Sequelize(`sqlite::memory:`, { logging: false });
+  await initDB(mockDB, { categories: mockCategories, articles: mockArticles });
+
   const app = express();
   app.use(express.json());
 
-  const clonedData = JSON.parse(JSON.stringify(mockData));
-  const articlesCommentsRouter = comments(new CommentService());
+  const articlesCommentsRouter = comments(new CommentService(mockDB));
+  articles(app, new DataService(mockDB), articlesCommentsRouter);
 
-  articles(app, new DataService(clonedData), articlesCommentsRouter);
   return app;
 };
 
 describe(`API returns a list of all articles`, () => {
-  const app = createAPI();
-
+  let app;
   let response;
 
   beforeAll(async () => {
+    app = await createApi();
     response = await request(app).get(`/articles`);
   });
 
@@ -44,19 +49,14 @@ describe(`API returns a list of all articles`, () => {
   test(`Should return a list of 5 articles`, () => {
     expect(response.body.length).toBe(5);
   });
-
-  test(`Should return article with expected id"`, () => {
-    const EXPECTED_ID = mockArticleId;
-    expect(response.body[0].id).toBe(EXPECTED_ID);
-  });
 });
 
 describe(`API returns an article with given id`, () => {
-  const app = createAPI();
-
+  let app;
   let response;
 
   beforeAll(async () => {
+    app = await createApi();
     response = await request(app).get(`/articles/${mockArticleId}`);
   });
 
@@ -71,11 +71,11 @@ describe(`API returns an article with given id`, () => {
 });
 
 describe(`API creates an article if the passed data is valid`, () => {
-  const app = createAPI();
-
+  let app;
   let response;
 
   beforeAll(async () => {
+    app = await createApi();
     response = await request(app).post(`/articles`).send(mockValidArticle);
   });
 
@@ -84,7 +84,7 @@ describe(`API creates an article if the passed data is valid`, () => {
   });
 
   test(`Should return the created article`, () => {
-    expect(response.body).toEqual(expect.objectContaining(mockValidArticle));
+    expect(response.body.id).toEqual(6);
   });
 
   test(`Should increase the number of articles by 1`, () => {
@@ -95,7 +95,11 @@ describe(`API creates an article if the passed data is valid`, () => {
 });
 
 describe(`API does not create an article if the passed data is invalid`, () => {
-  const app = createAPI();
+  let app;
+
+  beforeAll(async () => {
+    app = await createApi();
+  });
 
   test(`Should return status code 400 without any required properties`, async () => {
     for (const key of Object.keys(mockValidArticle)) {
@@ -112,11 +116,11 @@ describe(`API does not create an article if the passed data is invalid`, () => {
 });
 
 describe(`API changes an existing article`, () => {
-  const app = createAPI();
-
+  let app;
   let response;
 
   beforeAll(async () => {
+    app = await createApi();
     response = await request(app)
       .put(`/articles/${mockArticleId}`)
       .send(mockValidArticle);
@@ -126,8 +130,8 @@ describe(`API changes an existing article`, () => {
     expect(response.statusCode).toBe(HttpCode.OK);
   });
 
-  test(`Should return updated article`, () => {
-    expect(response.body).toEqual(expect.objectContaining(mockValidArticle));
+  test(`Should return true`, () => {
+    expect(response.body).toBe(true);
   });
 
   test(`Should return article with expected title`, () => {
@@ -139,8 +143,8 @@ describe(`API changes an existing article`, () => {
   });
 });
 
-test(`API returns status code 404 when trying to change non-existent article`, () => {
-  const app = createAPI();
+test(`API returns status code 404 when trying to change non-existent article`, async () => {
+  const app = await createApi();
 
   return request(app)
     .put(`/articles/NOEXIST`)
@@ -148,21 +152,21 @@ test(`API returns status code 404 when trying to change non-existent article`, (
     .expect(HttpCode.NOT_FOUND);
 });
 
-test(`API returns status code 400 when trying to change an article with invalid data`, () => {
-  const app = createAPI();
+test(`API returns status code 400 when trying to change an article with invalid data`, async () => {
+  const app = await createApi();
 
   return request(app)
     .put(`/articles/${mockArticleId}`)
-    .send(mockInvalidData)
+    .send(mockInvalidArticle)
     .expect(HttpCode.BAD_REQUEST);
 });
 
 describe(`API correctly deletes an article`, () => {
-  const app = createAPI();
-
+  let app;
   let response;
 
   beforeAll(async () => {
+    app = await createApi();
     response = await request(app).delete(`/articles/${mockArticleId}`);
   });
 
@@ -170,8 +174,8 @@ describe(`API correctly deletes an article`, () => {
     expect(response.statusCode).toBe(HttpCode.OK);
   });
 
-  test(`Should return deleted article`, () => {
-    expect(response.body.id).toBe(mockArticleId);
+  test(`Should return true`, () => {
+    expect(response.body).toBe(true);
   });
 
   test(`Should decrease the number of articles by 1`, () => {
@@ -181,7 +185,7 @@ describe(`API correctly deletes an article`, () => {
   });
 });
 
-test(`API returns status code 404 when trying to delete non-existent article`, () => {
-  const app = createAPI();
+test(`API returns status code 404 when trying to delete non-existent article`, async () => {
+  const app = await createApi();
   return request(app).delete(`/articles/NOEXIST`).expect(HttpCode.NOT_FOUND);
 });
