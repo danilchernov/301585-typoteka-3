@@ -2,23 +2,31 @@
 
 const express = require(`express`);
 const request = require(`supertest`);
-const { HttpCode } = require(`../../../constants`);
+const Sequelize = require(`sequelize`);
 
+const initDB = require(`../../lib/init-db`);
 const search = require(`./search`);
 const DataService = require(`../../data-service/search`);
 
-const { mockData } = require(`./search.mock`);
+const { HttpCode } = require(`../../../constants`);
+
+const { mockCategories, mockArticles } = require(`./search.mock`);
+const mockDB = new Sequelize(`sqlite::memory:`, { logging: false });
 
 const app = express();
 app.use(express.json());
-search(app, new DataService(mockData));
+
+beforeAll(async () => {
+  await initDB(mockDB, { categories: mockCategories, articles: mockArticles });
+  search(app, new DataService(mockDB));
+});
 
 describe(`API returns a list of articles based on search query`, () => {
   let response;
 
   beforeAll(async () => {
     response = await request(app).get(`/search`).query({
-      query: `обзор`,
+      query: `Обзор`,
     });
   });
 
@@ -30,10 +38,10 @@ describe(`API returns a list of articles based on search query`, () => {
     expect(response.body.length).toBe(1);
   });
 
-  test(`Should return article with expected id`, () => {
-    const EXPECTED_ID = `2ADkAX`;
+  test(`Should return article with expected title`, () => {
+    const EXPECTED_TITLE = `Обзор новейшего смартфона`;
     const [article] = response.body;
-    expect(article.id).toBe(EXPECTED_ID);
+    expect(article.title).toBe(EXPECTED_TITLE);
   });
 });
 
