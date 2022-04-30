@@ -6,9 +6,17 @@ const mainRoutes = new Router();
 
 const api = getApi();
 
-mainRoutes.get(`/`, async (req, res) => {
-  const articles = await api.getArticles();
-  return res.render(`views/main/index`, { articles });
+mainRoutes.get(`/`, async (req, res, next) => {
+  try {
+    const [articles, categories] = await Promise.all([
+      api.getArticles({ comments: true }),
+      api.getCategories({ count: true }),
+    ]);
+
+    return res.render(`views/main/index`, { articles, categories });
+  } catch (err) {
+    return next(err);
+  }
 });
 
 mainRoutes.get(`/register`, (req, res) => {
