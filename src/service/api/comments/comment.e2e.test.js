@@ -2,39 +2,44 @@
 
 const express = require(`express`);
 const request = require(`supertest`);
-const { HttpCode } = require(`../../../constants`);
+const Sequelize = require(`sequelize`);
 
+const initDB = require(`../../lib/init-db`);
 const articles = require(`../articles/articles`);
 const comments = require(`./comments`);
-
 const DataService = require(`../../data-service/article`);
 const CommentService = require(`../../data-service/comment`);
 
+const { HttpCode } = require(`../../../constants`);
+
 const {
-  mockData,
+  mockCategories,
+  mockArticles,
   mockArticleId,
   mockCommentId,
   mockValidComment,
   mockInvalidComment,
 } = require(`./comments.mock`);
 
-const createAPI = () => {
+const createApi = async () => {
+  const mockDB = new Sequelize(`sqlite::memory:`, { logging: false });
+  await initDB(mockDB, { categories: mockCategories, articles: mockArticles });
+
   const app = express();
   app.use(express.json());
 
-  const clonedData = JSON.parse(JSON.stringify(mockData));
-  const articlesCommentsRouter = comments(new CommentService());
+  const articlesCommentsRouter = comments(new CommentService(mockDB));
+  articles(app, new DataService(mockDB), articlesCommentsRouter);
 
-  articles(app, new DataService(clonedData), articlesCommentsRouter);
   return app;
 };
 
 describe(`API returns a list of comments for the specified article`, () => {
-  const app = createAPI();
-
+  let app;
   let response;
 
   beforeAll(async () => {
+    app = await createApi();
     response = await request(app).get(`/articles/${mockArticleId}/comments`);
   });
 
@@ -46,14 +51,14 @@ describe(`API returns a list of comments for the specified article`, () => {
     expect(response.body.length).toBe(2);
   });
 
-  test(`Should return comment with expected id"`, () => {
-    const EXPECTED_ID = mockCommentId;
-    expect(response.body[0].id).toBe(EXPECTED_ID);
+  test(`Should return comment with expected text"`, () => {
+    const EXPECTED_TEXT = `С чем связана продажа? Почему так дешёво?`;
+    expect(response.body[0].text).toBe(EXPECTED_TEXT);
   });
 });
 
-test(`API returns status code 404 when trying to get a list of comments from a non-existent article`, () => {
-  const app = createAPI();
+test(`API returns status code 404 when trying to get a list of comments from a non-existent article`, async () => {
+  const app = await createApi();
 
   return request(app)
     .get(`/articles/NOEXIST/comments/${mockCommentId}`)
@@ -61,11 +66,11 @@ test(`API returns status code 404 when trying to get a list of comments from a n
 });
 
 describe(`API creates an comment if the passed data is valid`, () => {
-  const app = createAPI();
-
+  let app;
   let response;
 
   beforeAll(async () => {
+    app = await createApi();
     response = await request(app)
       .post(`/articles/${mockArticleId}/comments`)
       .send(mockValidComment);
@@ -85,8 +90,8 @@ describe(`API creates an comment if the passed data is valid`, () => {
       .expect((res) => expect(res.body.length).toBe(3)));
 });
 
-test(`API returns status code 400 when trying to add a comment with invalid data`, () => {
-  const app = createAPI();
+test(`API returns status code 400 when trying to add a comment with invalid data`, async () => {
+  const app = await createApi();
 
   return request(app)
     .post(`/articles/${mockArticleId}/comments`)
@@ -94,8 +99,8 @@ test(`API returns status code 400 when trying to add a comment with invalid data
     .expect(HttpCode.BAD_REQUEST);
 });
 
-test(`API returns status code 404 when trying to add a comment to a non-existent article`, () => {
-  const app = createAPI();
+test(`API returns status code 404 when trying to add a comment to a non-existent article`, async () => {
+  const app = await createApi();
 
   return request(app)
     .post(`/articles/NOEXIST/comments`)
@@ -104,11 +109,11 @@ test(`API returns status code 404 when trying to add a comment to a non-existent
 });
 
 describe(`API correctly deletes a comment`, () => {
-  const app = createAPI();
-
+  let app;
   let response;
 
   beforeAll(async () => {
+    app = await createApi();
     response = await request(app).delete(
       `/articles/${mockArticleId}/comments/${mockCommentId}`
     );
@@ -117,8 +122,7 @@ describe(`API correctly deletes a comment`, () => {
   test(`Should return status code 200`, () =>
     expect(response.statusCode).toBe(HttpCode.OK));
 
-  test(`Should return deleted comment`, () =>
-    expect(response.body.id).toBe(mockCommentId));
+  test(`Should return true`, () => expect(response.body).toBe(true));
 
   test(`Should decrease the number of articles by 1`, () =>
     request(app)
@@ -126,16 +130,16 @@ describe(`API correctly deletes a comment`, () => {
       .expect((res) => expect(res.body.length).toBe(1)));
 });
 
-test(`API returns status code 404 when trying to delete non-existent comment`, () => {
-  const app = createAPI();
+test(`API returns status code 404 when trying to delete non-existent comment`, async () => {
+  const app = await createApi();
 
   return request(app)
     .delete(`/articles/${mockArticleId}/comments/NOEXIST`)
     .expect(HttpCode.NOT_FOUND);
 });
 
-test(`API returns 404 status code when trying to remove a comment from a non-existent article`, () => {
-  const app = createAPI();
+test(`API returns 404 status code when trying to remove a comment from a non-existent article`, async () => {
+  const app = await createApi();
 
   return request(app)
     .delete(`/articles/NOEXIST/comments/IuMBOc`)

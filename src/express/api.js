@@ -20,20 +20,20 @@ class API {
     return response.data;
   }
 
-  async getArticles() {
-    return await this._load(`/articles`);
+  async getArticles({ comments } = {}) {
+    return await this._load(`/articles`, { params: { comments } });
   }
 
-  async getArticle(id) {
-    return await this._load(`/articles/${id}`);
+  async getArticle(id, { comments } = {}) {
+    return await this._load(`/articles/${id}`, { params: { comments } });
   }
 
   async search(query) {
     return await this._load(`/search`, { params: { query } });
   }
 
-  async getCategories() {
-    return await this._load(`/categories`);
+  async getCategories({ count } = {}) {
+    return await this._load(`/categories`, { params: { count } });
   }
 
   async createArticle(data) {

@@ -13,7 +13,7 @@
     "format": "npm run prettier:fix && npm run eslint:fix",
     "start-back-server": "cross-env LOG_LEVEL=error node -r dotenv/config ./src/service/service.js --server",
     "start-back-server:debug": "cross-env LOG_LEVEL=info NODE_ENV=development nodemon -r dotenv/config ./src/service/service.js --server",
-    "start-front-server": "node ./src/express/express",
+    "start-front-server": "nodemon ./src/express/express",
     "start:parallel": "concurrently \"npm run start-back-server:debug\" \"npm run start-front-server\""
   },
   "repository": {
@@ -36,6 +36,7 @@
     "pino-pretty": "7.6.0",
     "prettier": "2.6.1",
     "pug-lint": "2.6.0",
+    "sqlite3": "5.0.6",
     "supertest": "6.2.2"
   },
   "dependencies": {

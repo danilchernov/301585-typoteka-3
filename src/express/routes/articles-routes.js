@@ -25,7 +25,7 @@ articlesRoutes.post(`/add`, upload.single(`upload`), async (req, res) => {
     announce: body.announcement,
     fullText: body[`full-text`],
     createdDate: body.date,
-    category: ensureArray(body.category),
+    categories: ensureArray(body.category),
     image: file.filename,
   };
 
@@ -45,14 +45,18 @@ articlesRoutes.get(`/edit/:id`, async (req, res, next) => {
       api.getArticle(id),
       api.getCategories(),
     ]);
+
     return res.render(`views/articles/editor`, { article, categories });
   } catch (err) {
     return next(err);
   }
 });
 
-articlesRoutes.get(`/:id`, (req, res) => {
-  return res.render(`views/articles/article`);
+articlesRoutes.get(`/:id`, async (req, res) => {
+  const { id } = req.params;
+  const article = await api.getArticle(id, { comments: true });
+
+  return res.render(`views/articles/article`, { article });
 });
 
 module.exports = articlesRoutes;

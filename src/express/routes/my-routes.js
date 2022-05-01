@@ -12,12 +12,13 @@ myRoutes.get(`/`, async (req, res) => {
 });
 
 myRoutes.get(`/comments`, async (req, res) => {
-  const articles = await api.getArticles();
-  return res.render(`views/my/comments`, { articles });
+  const articles = await api.getArticles({ comments: true });
+  return res.render(`views/my/comments`, { articles: articles.slice(0, 3) });
 });
 
-myRoutes.get(`/categories`, (req, res) => {
-  return res.render(`views/my/categories`);
+myRoutes.get(`/categories`, async (req, res) => {
+  const categories = await api.getCategories();
+  return res.render(`views/my/categories`, { categories });
 });
 
 module.exports = myRoutes;

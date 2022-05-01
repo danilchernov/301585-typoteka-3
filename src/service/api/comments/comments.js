@@ -9,13 +9,13 @@ module.exports = (commentService) => {
 
   route.get(`/`, async (req, res) => {
     const { article } = res.locals;
-    const comments = await commentService.findAll(article);
+    const comments = await commentService.findAll(article.id);
     return res.status(HttpCode.OK).json(comments);
   });
 
   route.post(`/`, commentValidator, async (req, res) => {
     const { article } = res.locals;
-    const comment = await commentService.create(req.body, article);
+    const comment = await commentService.create(req.body, article.id);
 
     return res.status(HttpCode.CREATED).json(comment);
   });
@@ -24,8 +24,8 @@ module.exports = (commentService) => {
     `/:commentId`,
     commentExist(commentService),
     async (req, res) => {
-      const { comment, article } = res.locals;
-      const deletedComment = await commentService.delete(comment.id, article);
+      const { comment } = res.locals;
+      const deletedComment = await commentService.delete(comment.id);
 
       return res.status(HttpCode.OK).json(deletedComment);
     }

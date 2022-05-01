@@ -15,8 +15,9 @@ module.exports = (api, articleService, commentsRouter) => {
   );
 
   route.get(`/`, async (req, res) => {
-    const categories = await articleService.findAll();
-    return res.status(HttpCode.OK).json(categories);
+    const { comments = false } = req.query;
+    const articles = await articleService.findAll({ comments });
+    return res.status(HttpCode.OK).json(articles);
   });
 
   route.post(`/`, articleValidator, async (req, res) => {
