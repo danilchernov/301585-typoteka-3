@@ -1,3 +1,5 @@
+/* eslint-disable new-cap */
+
 "use strict";
 
 const { Model, DataTypes } = require(`sequelize`);
@@ -10,7 +12,6 @@ const define = (sequelize) => {
   return Category.init(
     {
       name: {
-        // eslint-disable-next-line new-cap
         type: DataTypes.STRING(30),
         allowNull: false,
       },
