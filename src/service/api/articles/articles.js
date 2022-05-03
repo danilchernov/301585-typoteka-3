@@ -18,11 +18,10 @@ module.exports = (api, articleService, commentsRouter) => {
     const { comments = false, limit = null, offset = null } = req.query;
     let result;
 
-    if (limit || offset) {
-      result = await articleService.findPage({ limit, offset, comments });
-    } else {
-      result = await articleService.findAll({ comments });
-    }
+    result =
+      limit || offset
+        ? await articleService.findPage({ limit, offset, comments })
+        : await articleService.findAll({ comments });
 
     return res.status(HttpCode.OK).json(result);
   });
