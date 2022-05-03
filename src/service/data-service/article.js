@@ -39,6 +39,24 @@ class ArticleService {
     return articles.map((item) => item.get());
   }
 
+  async findPage({ comments, limit, offset } = {}) {
+    const include = [Alias.CATEGORIES];
+
+    if (comments) {
+      include.push(Alias.COMMENTS);
+    }
+
+    const { count, rows } = await this._Article.findAndCountAll({
+      limit,
+      offset,
+      include,
+      order: [[`createdAt`, `DESC`]],
+      distinct: true,
+    });
+
+    return { count, articles: rows };
+  }
+
   async update(id, articleData) {
     const [affectedRows] = await this._Article.update(articleData, {
       where: { id },
