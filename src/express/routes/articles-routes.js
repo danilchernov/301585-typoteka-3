@@ -52,11 +52,14 @@ articlesRoutes.get(`/edit/:id`, async (req, res, next) => {
   }
 });
 
-articlesRoutes.get(`/:id`, async (req, res) => {
-  const { id } = req.params;
-  const article = await api.getArticle(id, { comments: true });
-
-  return res.render(`views/articles/article`, { article });
+articlesRoutes.get(`/:id`, async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const article = await api.getArticle(id, { comments: true });
+    return res.render(`views/articles/article`, { article });
+  } catch (err) {
+    return next();
+  }
 });
 
 module.exports = articlesRoutes;

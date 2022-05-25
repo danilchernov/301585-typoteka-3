@@ -5,6 +5,8 @@ const request = require(`supertest`);
 const Sequelize = require(`sequelize`);
 
 const initDB = require(`../../lib/init-db`);
+const { getLogger } = require(`../../lib/logger`);
+
 const articles = require(`../articles/articles`);
 const comments = require(`./comments`);
 const DataService = require(`../../data-service/article`);
@@ -26,10 +28,12 @@ const createApi = async () => {
   await initDB(mockDB, { categories: mockCategories, articles: mockArticles });
 
   const app = express();
+  const logger = getLogger();
+
   app.use(express.json());
 
-  const articlesCommentsRouter = comments(new CommentService(mockDB));
-  articles(app, new DataService(mockDB), articlesCommentsRouter);
+  const articlesCommentsRouter = comments(new CommentService(mockDB), logger);
+  articles(app, new DataService(mockDB), articlesCommentsRouter, logger);
 
   return app;
 };

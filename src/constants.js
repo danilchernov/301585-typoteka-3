@@ -3,6 +3,7 @@
 module.exports.Env = {
   DEVELOPMENT: `development`,
   PRODUCTION: `production`,
+  TEST: `test`,
 };
 
 module.exports.ExitCode = {

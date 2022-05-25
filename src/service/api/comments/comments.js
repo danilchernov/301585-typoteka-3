@@ -2,9 +2,9 @@
 
 const { Router } = require(`express`);
 const { HttpCode } = require(`../../../constants`);
-const { commentValidator, commentExist } = require(`../../middlewares`);
+const { commentValidator } = require(`../../middlewares`);
 
-module.exports = (commentService) => {
+module.exports = (commentService, logger) => {
   const route = new Router({ mergeParams: true });
 
   route.get(`/`, async (req, res) => {
@@ -20,16 +20,22 @@ module.exports = (commentService) => {
     return res.status(HttpCode.CREATED).json(comment);
   });
 
-  route.delete(
-    `/:commentId`,
-    commentExist(commentService),
-    async (req, res) => {
-      const { comment } = res.locals;
-      const deletedComment = await commentService.delete(comment.id);
+  route.delete(`/:commentId`, async (req, res) => {
+    const { commentId } = req.params;
+    const deletedComment = await commentService.delete(commentId);
 
-      return res.status(HttpCode.OK).json(deletedComment);
+    if (!deletedComment) {
+      logger.error(
+        `[${req.method}] Comment with id "${commentId}" not found ${req.originalUrl}`
+      );
+
+      return res
+        .status(HttpCode.NOT_FOUND)
+        .send(`Comment with ${commentId} not found`);
     }
-  );
+
+    return res.status(HttpCode.OK).json(deletedComment);
+  });
 
   return route;
 };

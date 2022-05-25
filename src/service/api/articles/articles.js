@@ -2,17 +2,16 @@
 
 const { Router } = require(`express`);
 const { HttpCode } = require(`../../../constants`);
-const { articleValidator, articleExist } = require(`../../middlewares`);
+const { articleValidator } = require(`../../middlewares`);
+const articleExists = require(`../../middlewares/article-exists`);
 
-module.exports = (api, articleService, commentsRouter) => {
+module.exports = (api, articleService, commentsRouter, logger) => {
   const route = new Router();
+  const isArticleExists = articleExists(articleService, logger);
+
   api.use(`/articles`, route);
 
-  route.use(
-    `/:articleId/comments`,
-    articleExist(articleService),
-    commentsRouter
-  );
+  route.use(`/:articleId/comments`, isArticleExists, commentsRouter);
 
   route.get(`/`, async (req, res) => {
     const { comments = false, limit = null, offset = null } = req.query;
@@ -32,7 +31,7 @@ module.exports = (api, articleService, commentsRouter) => {
     return res.status(HttpCode.CREATED).json(article);
   });
 
-  route.get(`/:articleId`, articleExist(articleService), async (req, res) => {
+  route.get(`/:articleId`, isArticleExists, async (req, res) => {
     const { article } = res.locals;
 
     return res.status(HttpCode.OK).json(article);
@@ -40,7 +39,7 @@ module.exports = (api, articleService, commentsRouter) => {
 
   route.put(
     `/:articleId`,
-    [articleExist(articleService), articleValidator],
+    [isArticleExists, articleValidator],
     async (req, res) => {
       const { article } = res.locals;
       const updatedArticle = await articleService.update(article.id, req.body);
@@ -49,14 +48,10 @@ module.exports = (api, articleService, commentsRouter) => {
     }
   );
 
-  route.delete(
-    `/:articleId`,
-    articleExist(articleService),
-    async (req, res) => {
-      const { article } = res.locals;
-      const deletedArticle = await articleService.delete(article.id);
+  route.delete(`/:articleId`, isArticleExists, async (req, res) => {
+    const { article } = res.locals;
+    const deletedArticle = await articleService.delete(article.id);
 
-      return res.status(HttpCode.OK).json(deletedArticle);
-    }
-  );
+    return res.status(HttpCode.OK).json(deletedArticle);
+  });
 };

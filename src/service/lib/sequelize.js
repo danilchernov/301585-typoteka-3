@@ -1,7 +1,9 @@
 "use strict";
 
 const Sequelize = require(`sequelize`);
-const { DB_NAME, DB_USER, DB_PASSWORD, DB_HOST, DB_PORT } = process.env;
+const { Env } = require(`../../constants`);
+const { DB_NAME, DB_USER, DB_PASSWORD, DB_HOST, DB_PORT, NODE_ENV } =
+  process.env;
 
 const somethingIsNotDefined = [
   DB_NAME,
@@ -15,6 +17,8 @@ if (somethingIsNotDefined) {
   throw new Error(`One or more environmental variables are not defined`);
 }
 
+const isDevMode = NODE_ENV === Env.DEVELOPMENT;
+
 module.exports = new Sequelize(DB_NAME, DB_USER, DB_PASSWORD, {
   host: DB_HOST,
   port: DB_PORT,
@@ -25,4 +29,5 @@ module.exports = new Sequelize(DB_NAME, DB_USER, DB_PASSWORD, {
     acquire: 10000,
     idle: 10000,
   },
+  logging: isDevMode,
 });
