@@ -2,6 +2,7 @@
 
 const path = require(`path`);
 const express = require(`express`);
+const session = require(`express-session`);
 const { HttpCode } = require(`../constants`);
 
 const mainRoutes = require(`./routes/main-routes`);
@@ -13,6 +14,15 @@ const PUBLIC_DIR = `public`;
 const UPLOAD_DIR = `upload`;
 
 const app = express();
+
+app.use(
+  session({
+    secret: process.env.SECRET,
+    resave: false,
+    saveUninitialized: false,
+    name: `session_id`,
+  })
+);
 
 app.set(`views`, path.resolve(__dirname, `templates`));
 app.set(`view engine`, `pug`);
