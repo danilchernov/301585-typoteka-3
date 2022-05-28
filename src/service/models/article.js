@@ -20,7 +20,7 @@ const define = (sequelize) => {
         allowNull: false,
       },
       fullText: {
-        type: DataTypes.STRING,
+        type: DataTypes.STRING(1000),
         allowNull: false,
       },
       image: {
