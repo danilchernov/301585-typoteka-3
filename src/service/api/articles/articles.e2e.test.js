@@ -10,6 +10,7 @@ const { getLogger } = require(`../../lib/logger`);
 const articles = require(`./articles`);
 const comments = require(`../comments/comments`);
 const DataService = require(`../../data-service/article`);
+const CategoryService = require(`../../data-service/category`);
 const CommentService = require(`../../data-service/comment`);
 
 const { HttpCode } = require(`../../../constants`);
@@ -31,7 +32,13 @@ const createApi = async () => {
   app.use(express.json());
 
   const articlesCommentsRouter = comments(new CommentService(mockDB));
-  articles(app, new DataService(mockDB), articlesCommentsRouter, logger);
+  articles(
+    app,
+    new DataService(mockDB),
+    new CategoryService(mockDB),
+    articlesCommentsRouter,
+    logger
+  );
 
   return app;
 };
@@ -105,11 +112,38 @@ describe(`API does not create an article if the passed data is invalid`, () => {
   });
 
   test(`Should return status code 400 without any required properties`, async () => {
+    const badArticle = { ...mockValidArticle };
     for (const key of Object.keys(mockValidArticle)) {
-      const badArticle = { ...mockValidArticle };
-
       delete badArticle[key];
 
+      await request(app)
+        .post(`/articles`)
+        .send(badArticle)
+        .expect(HttpCode.BAD_REQUEST);
+    }
+  });
+
+  test(`Should return status code 400 if the passed data does not match the desired type`, async () => {
+    const badArticles = [
+      { ...mockValidArticle, title: 12345 },
+      { ...mockValidArticle, date: 111653737743971 },
+      { ...mockValidArticle, categories: 12345 },
+    ];
+    for (const badArticle of badArticles) {
+      await request(app)
+        .post(`/articles`)
+        .send(badArticle)
+        .expect(HttpCode.BAD_REQUEST);
+    }
+  });
+
+  test(`Should return status code 400 if the passed data does not match other schema criteria`, async () => {
+    const badArticles = [
+      { ...mockValidArticle, title: `Short title` },
+      { ...mockValidArticle, announce: `Short announce` },
+      { ...mockValidArticle, categories: [12345] },
+    ];
+    for (const badArticle of badArticles) {
       await request(app)
         .post(`/articles`)
         .send(badArticle)
@@ -150,7 +184,7 @@ test(`API returns status code 404 when trying to change non-existent article`, a
   const app = await createApi();
 
   return request(app)
-    .put(`/articles/NOEXIST`)
+    .put(`/articles/12345`)
     .send(mockValidArticle)
     .expect(HttpCode.NOT_FOUND);
 });
@@ -190,5 +224,13 @@ describe(`API correctly deletes an article`, () => {
 
 test(`API returns status code 404 when trying to delete non-existent article`, async () => {
   const app = await createApi();
-  return request(app).delete(`/articles/NOEXIST`).expect(HttpCode.NOT_FOUND);
+  return request(app).delete(`/articles/12345`).expect(HttpCode.NOT_FOUND);
+});
+
+test(`API returns status code 400 if an invalid type was passed when trying to interact with an article`, async () => {
+  const app = await createApi();
+
+  await request(app).get(`/articles/id`).expect(HttpCode.BAD_REQUEST);
+  await request(app).put(`/articles/id`).expect(HttpCode.BAD_REQUEST);
+  await request(app).delete(`/articles/id`).expect(HttpCode.BAD_REQUEST);
 });

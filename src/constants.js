@@ -22,6 +22,13 @@ module.exports.HttpCode = {
   INTERNAL_SERVER_ERROR: 500,
 };
 
+module.exports.HttpMethod = {
+  GET: `GET`,
+  POST: `POST`,
+  PUT: `PUT`,
+  DELETE: `DELETE`,
+};
+
 module.exports.Article = {
   TITLE_MIN_LENGTH: 30,
   TITLE_MAX_LENGTH: 250,
