@@ -19,7 +19,7 @@ block content
         if isSuccessfulSearch
           each result in results
             .search__result
-              time.search__date(datetime=`${result.createdAt}`) #{formatDate(result.createdAt)}
+              +date(result.createdAt)(class="search__date")
               a.search__link(href=`/articles/${result.id}`) #{result.title}
       if isUnsuccessfulSearch
         p.search-page__empty Ничего не нашлось

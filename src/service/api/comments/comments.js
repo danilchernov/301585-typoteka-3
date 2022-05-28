@@ -2,10 +2,22 @@
 
 const { Router } = require(`express`);
 const { HttpCode } = require(`../../../constants`);
-const { commentValidator } = require(`../../middlewares`);
+
+const routeParameterValidator = require(`../../middlewares/route-parameter-validator`);
+const routeParameterSchema = require(`../../schemas/route-parameter`);
+
+const commentValidator = require(`../../middlewares/comment-validator`);
+const commentSchema = require(`../../schemas/comment`);
 
 module.exports = (commentService, logger) => {
   const route = new Router({ mergeParams: true });
+  const isRouteParameterValid = routeParameterValidator(
+    routeParameterSchema,
+    logger
+  );
+  const isCommentValid = commentValidator(commentSchema, logger);
+
+  route.use(`/:commentId`, isRouteParameterValid);
 
   route.get(`/`, async (req, res) => {
     const { article } = res.locals;
@@ -13,7 +25,7 @@ module.exports = (commentService, logger) => {
     return res.status(HttpCode.OK).json(comments);
   });
 
-  route.post(`/`, commentValidator, async (req, res) => {
+  route.post(`/`, isCommentValid, async (req, res) => {
     const { article } = res.locals;
     const comment = await commentService.create(req.body, article.id);
 

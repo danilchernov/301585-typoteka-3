@@ -4,7 +4,12 @@ const fs = require(`fs`).promises;
 const chalk = require(`chalk`);
 
 const { ExitCode } = require(`../../constants`);
-const { shuffle, getRandomInt } = require(`../../utils`);
+const {
+  shuffle,
+  getRandomInt,
+  getRandomDate,
+  formatDate,
+} = require(`../../utils`);
 
 const FILE_NAME = `fill-db.sql`;
 const FILE_TITLES_PATH = `./data/titles.txt`;
@@ -38,6 +43,8 @@ const CommentLimit = {
   MAX: 3,
 };
 
+const MONTH_PERIOD = 3;
+
 const readContent = async (filePath) => {
   try {
     const content = await fs.readFile(filePath, `utf8`);
@@ -68,6 +75,13 @@ const generateCategories = (count, categoryCount) => {
   );
 
   return [...categories];
+};
+
+const generateDate = () => {
+  const today = new Date();
+  const nMonthsAgo = new Date(today).setMonth(today.getMonth() - MONTH_PERIOD);
+
+  return formatDate(getRandomDate(new Date(nMonthsAgo), today));
 };
 
 const generateArticles = (
@@ -101,6 +115,7 @@ const generateArticles = (
       ),
       image: images[getRandomInt(0, images.length - 1)],
       userId: getRandomInt(1, userCount),
+      date: generateDate(),
     }));
 
 module.exports = {
@@ -167,8 +182,8 @@ module.exports = {
 
     const articleValues = articles
       .map(
-        ({ title, announce, fullText, image, userId }) =>
-          `('${title}', '${announce}', '${fullText}', '${image}', ${userId})`
+        ({ title, announce, fullText, image, userId, date }) =>
+          `('${title}', '${announce}', '${fullText}', '${image}', ${userId}, ${date})`
       )
       .join(`,\n`);
 

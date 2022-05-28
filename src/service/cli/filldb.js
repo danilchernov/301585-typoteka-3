@@ -48,6 +48,8 @@ const CommentLimit = {
   MAX: 5,
 };
 
+const MONTH_PERIOD = 3;
+
 const readContent = async (filePath) => {
   try {
     const content = await fs.readFile(filePath, `utf8`);
@@ -76,7 +78,7 @@ const genereteFullText = (count, sentences) => {
 
 const generateDate = () => {
   const today = new Date();
-  const nMonthsAgo = new Date(today).setMonth(today.getMonth() - 3);
+  const nMonthsAgo = new Date(today).setMonth(today.getMonth() - MONTH_PERIOD);
 
   return formatDate(getRandomDate(new Date(nMonthsAgo), today));
 };
@@ -125,7 +127,7 @@ const generateArticles = (
           getRandomInt(CommentLimit.MIN, CommentLimit.MAX),
           comments
         ),
-        createdDate: generateDate(),
+        date: generateDate(),
       };
     });
 };

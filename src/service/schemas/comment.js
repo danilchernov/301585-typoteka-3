@@ -7,6 +7,7 @@ module.exports = Joi.object({
   text: Joi.string()
     .min(Comment.TEXT_MIN_LENGTH)
     .max(Comment.TEXT_MAX_LENGTH)
+    .empty(``)
     .required()
     .messages({
       "string.min": CommentMessage.TEXT_MIN_LENGTH,

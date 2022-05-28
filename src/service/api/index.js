@@ -28,7 +28,13 @@ module.exports = async (logger) => {
   );
 
   categories(app, new CategoryService(sequelize), logger);
-  articles(app, new ArticleService(sequelize), articlesCommentsRouter, logger);
+  articles(
+    app,
+    new ArticleService(sequelize),
+    new CategoryService(sequelize),
+    articlesCommentsRouter,
+    logger
+  );
   search(app, new SearchService(sequelize), logger);
 
   return app;

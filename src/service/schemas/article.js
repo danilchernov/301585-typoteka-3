@@ -25,8 +25,9 @@ module.exports = (categories) =>
       }),
     fullText: Joi.string()
       .max(Article.FULL_TEXT_MAX_LENGTH)
+      .empty(``)
       .messages({ "string.max": ArticleMessage.FULL_TEXT_MAX_LENGTH }),
-    image: Joi.string(),
+    image: Joi.string().empty(``),
     categories: Joi.array()
       .items(Joi.number().valid(...categories))
       .min(Article.CATEGORIES_MIN_LENGTH)
@@ -34,10 +35,10 @@ module.exports = (categories) =>
       .messages({
         "array.base": ArticleMessage.CATEGORIES_BASE,
         "array.min": ArticleMessage.CATEGORIES_MIN_LENGTH,
-        "any.only": ArticleMessage.СATEGORIES_ONLY,
+        "any.only": ArticleMessage.CATEGORIES_ONLY,
         "any.required": ArticleMessage.CATEGORIES_MIN_LENGTH,
       }),
-    date: Joi.string().isoDate().required().messages({
+    date: Joi.string().isoDate().empty(``).required().messages({
       "string.isoDate": ArticleMessage.DATE_ISO_DATE,
       "any.required": ArticleMessage.DATE_REQUIRED,
     }),

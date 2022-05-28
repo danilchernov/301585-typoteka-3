@@ -2,15 +2,36 @@
 
 const { Router } = require(`express`);
 const { HttpCode } = require(`../../../constants`);
-const { articleValidator } = require(`../../middlewares`);
-const articleExists = require(`../../middlewares/article-exists`);
 
-module.exports = (api, articleService, commentsRouter, logger) => {
+const routeParameterValidator = require(`../../middlewares/route-parameter-validator`);
+const routeParameterSchema = require(`../../schemas/route-parameter`);
+
+const articleExists = require(`../../middlewares/article-exists`);
+const articleValidator = require(`../../middlewares/article-validator`);
+const articleSchema = require(`../../schemas/article`);
+
+module.exports = (
+  api,
+  articleService,
+  CategoryService,
+  commentsRouter,
+  logger
+) => {
   const route = new Router();
+
+  const isRouteParameterValid = routeParameterValidator(
+    routeParameterSchema,
+    logger
+  );
   const isArticleExists = articleExists(articleService, logger);
+  const isArticleValid = articleValidator(
+    articleSchema,
+    CategoryService,
+    logger
+  );
 
   api.use(`/articles`, route);
-
+  route.use(`/:articleId`, isRouteParameterValid);
   route.use(`/:articleId/comments`, isArticleExists, commentsRouter);
 
   route.get(`/`, async (req, res) => {
@@ -25,7 +46,7 @@ module.exports = (api, articleService, commentsRouter, logger) => {
     return res.status(HttpCode.OK).json(result);
   });
 
-  route.post(`/`, articleValidator, async (req, res) => {
+  route.post(`/`, isArticleValid, async (req, res) => {
     const article = await articleService.create(req.body);
 
     return res.status(HttpCode.CREATED).json(article);
@@ -39,7 +60,7 @@ module.exports = (api, articleService, commentsRouter, logger) => {
 
   route.put(
     `/:articleId`,
-    [isArticleExists, articleValidator],
+    [isArticleExists, isArticleValid],
     async (req, res) => {
       const { article } = res.locals;
       const updatedArticle = await articleService.update(article.id, req.body);

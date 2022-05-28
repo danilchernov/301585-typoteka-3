@@ -45,5 +45,10 @@ module.exports.formatDate = (date) => {
   );
 };
 
-module.exports.ensureArray = (value) =>
-  Array.isArray(value) ? value : [value];
+module.exports.ensureArray = (value) => {
+  if (!value) {
+    return [];
+  }
+
+  return Array.isArray(value) ? value : [value];
+};

@@ -44,6 +44,20 @@ class API {
       data,
     });
   }
+
+  async updateArticle(id, data) {
+    return await this._load(`/articles/${id}`, {
+      method: `PUT`,
+      data,
+    });
+  }
+
+  async createComment(id, data) {
+    return await this._load(`/articles/${id}/comments`, {
+      method: `POST`,
+      data,
+    });
+  }
 }
 
 const defaultAPI = new API(defaultUrl, TIMEOUT);

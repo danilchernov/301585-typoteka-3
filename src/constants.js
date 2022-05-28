@@ -23,7 +23,7 @@ module.exports.HttpCode = {
 };
 
 module.exports.Article = {
-  TITLE_MIN_LENGTH: 20,
+  TITLE_MIN_LENGTH: 30,
   TITLE_MAX_LENGTH: 250,
   ANNOUNCE_MIN_LENGTH: 30,
   ANNOUNCE_MAX_LENGTH: 250,
@@ -40,10 +40,10 @@ module.exports.ArticleMessage = {
   ANNOUNCE_REQUIRED: `Анонс публикации не может быть пустым`,
   FULL_TEXT_MAX_LENGTH: `Полный текст публикации не может содержать более ${module.exports.Article.FULL_TEXT_MAX_LENGTH} символов`,
   CATEGORIES_BASE: `Значение не относится к типу массива или не может быть приведено к массиву из строки`,
-  CATEGOEIES_MIN_LENGTH: `У публикации должна быть выбрана хотя бы ${module.exports.Article.CATEGORIES_MIN_LENGTH} категория`,
+  CATEGORIES_MIN_LENGTH: `У публикации должна быть выбрана хотя бы ${module.exports.Article.CATEGORIES_MIN_LENGTH} категория`,
   CATEGORIES_ONLY: `Указана несуществующая категория`,
   DATE_ISO_DATE: `Строка не является допустимой строкой даты ISO`,
-  DATE_REQUIRED: `Укажите дату создания публикации`,
+  DATE_REQUIRED: `Укажите дату`,
 };
 
 module.exports.Comment = {
@@ -52,9 +52,22 @@ module.exports.Comment = {
 };
 
 module.exports.CommentMessage = {
-  TEXT_MIN_LENGTH: `Текст комментария должен быть не меньше ${module.exports.Comment.MIN_TEXT_LENGTH} символов`,
-  TEXT_MAX_LENGTH: `Текст объявления должен быть не больше ${module.exports.Comment.MAX_TEXT_LENGTH} символов`,
+  TEXT_MIN_LENGTH: `Текст комментария должен быть не меньше ${module.exports.Comment.TEXT_MIN_LENGTH} символов`,
+  TEXT_MAX_LENGTH: `Текст объявления должен быть не больше ${module.exports.Comment.TEXT_MAX_LENGTH} символов`,
   REQUIRED: `Текст комментария не может быть пустым`,
+};
+
+module.exports.RouteParameter = {
+  ARTICLE_ID_MIN: 1,
+  COMMENT_ID_MIN: 1,
+};
+module.exports.RouteParameterMessage = {
+  ARTICLE_ID_BASE: `Идентификатор ресурса должен быть натуральным числом`,
+  ARTICLE_ID_MIN: `Идентификатор ресурса должен быть больше нуля`,
+  ARTICLE_ID_INTEGER: `Идентификатор ресурса должен быть целым числом`,
+  COMMENT_ID_BASE: `Идентификатор ресурса должен быть натуральным числом`,
+  COMMENT_ID_MIN: `Идентификатор ресурса должен быть больше нуля`,
+  COMMENT_ID_INTEGER: `Идентификатор ресурса должен быть целым числом`,
 };
 
 module.exports.API_PREFIX = `/api`;
