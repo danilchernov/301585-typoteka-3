@@ -21,13 +21,21 @@ const app = new Router();
 
 defineModels(sequelize);
 
-(async () => {
-  const articlesCommentsRouter = comments(new CommentService(sequelize));
-  categories(app, new CategoryService(sequelize));
-  articles(app, new ArticleService(sequelize), articlesCommentsRouter);
-  search(app, new SearchService(sequelize));
+module.exports = async (logger) => {
+  const articlesCommentsRouter = comments(
+    new CommentService(sequelize),
+    logger
+  );
+
+  categories(app, new CategoryService(sequelize), logger);
+  articles(
+    app,
+    new ArticleService(sequelize),
+    new CategoryService(sequelize),
+    articlesCommentsRouter,
+    logger
+  );
+  search(app, new SearchService(sequelize), logger);
 
   return app;
-})();
-
-module.exports = app;
+};

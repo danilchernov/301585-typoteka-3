@@ -1,7 +1,6 @@
 "use strict";
 
 const fs = require(`fs`).promises;
-const chalk = require(`chalk`);
 
 const { getLogger } = require(`../lib/logger`);
 const sequelize = require(`../lib/sequelize`);
@@ -49,12 +48,14 @@ const CommentLimit = {
   MAX: 5,
 };
 
+const MONTH_PERIOD = 3;
+
 const readContent = async (filePath) => {
   try {
     const content = await fs.readFile(filePath, `utf8`);
     return content.trim().split(`\n`);
   } catch (err) {
-    console.error(chalk.red(err.message));
+    logger.error(err.message);
     return [];
   }
 };
@@ -77,7 +78,7 @@ const genereteFullText = (count, sentences) => {
 
 const generateDate = () => {
   const today = new Date();
-  const nMonthsAgo = new Date(today).setMonth(today.getMonth() - 3);
+  const nMonthsAgo = new Date(today).setMonth(today.getMonth() - MONTH_PERIOD);
 
   return formatDate(getRandomDate(new Date(nMonthsAgo), today));
 };
@@ -126,7 +127,7 @@ const generateArticles = (
           getRandomInt(CommentLimit.MIN, CommentLimit.MAX),
           comments
         ),
-        createdDate: generateDate(),
+        date: generateDate(),
       };
     });
 };
@@ -138,7 +139,9 @@ module.exports = {
       logger.info(`Trying to connect to database...`);
       await sequelize.authenticate();
     } catch (err) {
-      logger.error(`An error occurred: ${err.message}`);
+      logger.error(
+        `An unexpected error occurred while trying to connect to the database: ${err.message}`
+      );
       process.exit(ExitCode.UNCAUGHT_FATAL_EXCEPTION);
     }
     logger.info(`Connection to database established`);
@@ -147,7 +150,7 @@ module.exports = {
     const countArticles = Number.parseInt(count, 10) || ArticleLimit.MIN;
 
     if (countArticles > ArticleLimit.MAX) {
-      console.error(chalk.red(`No more than ${ArticleLimit.MAX} publications`));
+      logger.error(`No more than ${ArticleLimit.MAX} publications`);
       process.exit(ExitCode.UNCAUGHT_FATAL_EXCEPTION);
     }
 

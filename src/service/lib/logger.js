@@ -4,10 +4,13 @@ const pino = require(`pino`);
 const { Env } = require(`../../constants`);
 
 const LOG_FILE = `./logs/api.log`;
+
+const isTestMode = process.env.NODE_ENV === Env.TEST;
 const isDevMode = process.env.NODE_ENV === Env.DEVELOPMENT;
 const defaultLogLevel = isDevMode ? `info` : `error`;
 
 const logger = pino({
+  enabled: !isTestMode,
   name: `base-logger`,
   level: process.env.LOG_LEVEL || defaultLogLevel,
   transport: {

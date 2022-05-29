@@ -20,8 +20,14 @@ class ArticleService {
     return !!deletedRows;
   }
 
-  async findOne(id) {
-    return await this._Article.findByPk(id, { include: [Alias.CATEGORIES] });
+  async findOne(id, { comments } = {}) {
+    const include = [Alias.CATEGORIES];
+
+    if (comments) {
+      include.push(Alias.COMMENTS);
+    }
+
+    return this._Article.findByPk(id, { include });
   }
 
   async findAll({ comments } = {}) {

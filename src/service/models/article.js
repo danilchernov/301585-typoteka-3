@@ -12,11 +12,11 @@ const define = (sequelize) => {
   return Article.init(
     {
       title: {
-        type: DataTypes.STRING(250),
+        type: DataTypes.STRING,
         allowNull: false,
       },
       announce: {
-        type: DataTypes.STRING(250),
+        type: DataTypes.STRING,
         allowNull: false,
       },
       fullText: {
@@ -24,7 +24,10 @@ const define = (sequelize) => {
         allowNull: false,
       },
       image: {
-        type: DataTypes.STRING(50),
+        type: DataTypes.STRING,
+      },
+      date: {
+        type: DataTypes.DATE,
         allowNull: false,
       },
     },
