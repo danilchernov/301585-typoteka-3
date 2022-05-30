@@ -65,9 +65,8 @@ articlesRoutes.get(`/edit/:id`, async (req, res, next) => {
     if (updatedArticle) {
       article = { ...article, id };
 
-      const articleCategories = article.categories.reduce(
-        (acc, item) => [item.id.toString(), ...acc],
-        []
+      const articleCategories = article.categories.map((category) =>
+        category.id.toString()
       );
 
       article = { ...article, categories: articleCategories };
