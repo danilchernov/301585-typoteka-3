@@ -51,7 +51,7 @@ block content
                     p.comments__message #{comment.text}
 
           .comments__footer.comments__footer--user
-            form(action=`/articles/${article.id}` method="POST" enctype="multipart/form-data", autocomplete="off")
+            form(action=`/articles/${article.id}` method="POST" enctype="multipart/form-data" autocomplete="off")
               .comments__avatar.avatar
                 img(src="/img/avatar-1.png" alt="Аватар пользователя")
               label

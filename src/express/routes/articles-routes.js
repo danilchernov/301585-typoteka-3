@@ -100,9 +100,9 @@ articlesRoutes.post(`/edit/:id`, upload.single(`upload`), async (req, res) => {
   try {
     await api.updateArticle(id, article);
     return res.redirect(`/my`);
-  } catch (error) {
+  } catch (err) {
     req.session.updatedArticle = article;
-    req.session.validationMessages = error.response.data.validationMessages;
+    req.session.validationMessages = err.response.data.validationMessages;
 
     return res.redirect(`/articles/edit/${id}`);
   }
@@ -145,8 +145,8 @@ articlesRoutes.post(`/:id`, upload.single(`upload`), async (req, res) => {
   try {
     await api.createComment(id, comment);
     return res.redirect(`back`);
-  } catch (error) {
-    req.session.validationMessages = error.response.data.validationMessages;
+  } catch (err) {
+    req.session.validationMessages = err.response.data.validationMessages;
     return res.redirect(`back`);
   }
 });
