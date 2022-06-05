@@ -40,7 +40,7 @@ mainRoutes.get(`/register`, (req, res) => {
   const { user = null, validationMessages = null } = req.session;
 
   req.session.user = null;
-  req.session.errMessages = null;
+  req.session.validationMessages = null;
 
   return res.render(`views/main/register`, { user, validationMessages });
 });
