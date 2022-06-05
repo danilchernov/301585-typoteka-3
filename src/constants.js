@@ -93,8 +93,10 @@ module.exports.UserMessage = {
   LAST_NAME_REQUIRED: `Укажите вашу фамилию`,
   EMAIL_STRING: `Некорректный E-mail, проверьте введенные данные`,
   EMAIL_REQUIRED: `Укажите ваш E-mail`,
+  EMAIL_UNIQUE: `Пользователь с таким адресом электронной почты уже зарегистирован`,
+  EMAIL_NOT_EXIST: `Электронный адрес не существует`,
   PASSWORD_MIN_LENGTH: `Пароль должен содержать не меньше ${module.exports.User.PASSWORD_MIN_LENGTH} символов`,
   PASSWORD_REQUIRED: `Введите пароль`,
   PASSWORD_ONLY: `Пароли не совпадают, проверьте введенные данные`,
-  EMAIL_UNIQUE: `Пользователь с таким адресом электронной почты уже зарегистирован`,
+  PASSWORD_INVALID: `Неверный пароль`,
 };

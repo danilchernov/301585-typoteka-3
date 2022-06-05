@@ -1,8 +1,6 @@
 "use strict";
 
-const bcrypt = require(`bcrypt`);
-
-const SALT_ROUNDS = 10;
+const passwordUtils = require(`../lib/password`);
 
 class UserService {
   constructor(sequelize) {
@@ -10,7 +8,7 @@ class UserService {
   }
 
   async create(userData) {
-    const passwordHash = await bcrypt.hash(userData.password, SALT_ROUNDS);
+    const passwordHash = await passwordUtils.hash(userData.password);
 
     userData.passwordHash = passwordHash;
     delete userData.password;
@@ -30,6 +28,10 @@ class UserService {
     });
 
     return user && user.get();
+  }
+
+  async checkPassword(password, passwordHash) {
+    return await passwordUtils.compare(password, passwordHash);
   }
 }
 

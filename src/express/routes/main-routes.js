@@ -40,7 +40,7 @@ mainRoutes.get(`/register`, (req, res) => {
   const { user = null, validationMessages = null } = req.session;
 
   req.session.user = null;
-  req.session.errMessages = null;
+  req.session.validationMessages = null;
 
   return res.render(`views/main/register`, { user, validationMessages });
 });
@@ -69,7 +69,37 @@ mainRoutes.post(`/register`, upload.single(`upload`), async (req, res) => {
 });
 
 mainRoutes.get(`/login`, (req, res) => {
-  return res.render(`views/main/login`);
+  const { email, password, validationMessages } = req.session;
+
+  req.session.email = null;
+  req.session.password = null;
+
+  return res.render(`views/main/login`, {
+    email,
+    password,
+    validationMessages,
+  });
+});
+
+mainRoutes.post(`/login`, upload.single(`upload`), async (req, res) => {
+  const { body } = req;
+
+  const data = {
+    email: body.email,
+    password: body.password,
+  };
+
+  try {
+    const user = await api.loginUser(data);
+    req.session.loggedUser = user;
+    return res.redirect(`/`);
+  } catch (err) {
+    req.session.email = data.email;
+    req.session.password = data.password;
+    req.session.validationMessages = err.response.data.validationMessages;
+
+    return res.redirect(`/login`);
+  }
 });
 
 mainRoutes.get(`/search`, async (req, res) => {
@@ -80,6 +110,10 @@ mainRoutes.get(`/search`, async (req, res) => {
   } catch (err) {
     res.render(`views/main/search`, { searchText: ``, results: [] });
   }
+});
+
+mainRoutes.get(`/logout`, (req, res) => {
+  req.session.destroy(() => res.redirect(`/login`));
 });
 
 module.exports = mainRoutes;

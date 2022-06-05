@@ -10,12 +10,16 @@ block content
           | окно
         h2.popup__title Войти
         .popup__form.form.form--log-in
-          form(action='#' method='get')
+          form(action='/login' method='POST' enctype="multipart/form-data" autocomplete="off")
             .form__field
               label
-                input(type='email' name='email' placeholder='Электронная почта' required)
+                input(type='email' name='email' value=`${email ? email: ''}` placeholder='Электронная почта' required)
             .form__field
               label
-                input(type='password' name='password' placeholder='Пароль' required)
-            p.form__error-message Некоторая ошибка произошла, беда!
+                input(type='password' name='password' value=`${password ? password: ''}` placeholder='Пароль' required)
+            if validationMessages
+              p.form__error-message При регистрации произошли ошибки:
+                ul.form__errors
+                each error in validationMessages
+                  li.form__error #{error}
             button.form__submit-btn.form__submit-btn--log-in.button.button--colored(type='submit') Войти
