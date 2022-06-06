@@ -21,21 +21,13 @@ class ArticleService {
   }
 
   async findOne(id, { comments } = {}) {
-    const include = [Alias.CATEGORIES];
-
-    if (comments) {
-      include.push(Alias.COMMENTS);
-    }
+    const include = [Alias.CATEGORIES, ...(comments ? [Alias.COMMENTS] : [])];
 
     return this._Article.findByPk(id, { include });
   }
 
   async findAll({ comments } = {}) {
-    const include = [Alias.CATEGORIES];
-
-    if (comments) {
-      include.push(Alias.COMMENTS);
-    }
+    const include = [Alias.CATEGORIES, ...(comments ? [Alias.COMMENTS] : [])];
 
     const articles = await this._Article.findAll({
       include,
@@ -46,11 +38,7 @@ class ArticleService {
   }
 
   async findPage({ comments, limit, offset } = {}) {
-    const include = [Alias.CATEGORIES];
-
-    if (comments) {
-      include.push(Alias.COMMENTS);
-    }
+    const include = [Alias.CATEGORIES, ...(comments ? [Alias.COMMENTS] : [])];
 
     const { count, rows } = await this._Article.findAndCountAll({
       limit,

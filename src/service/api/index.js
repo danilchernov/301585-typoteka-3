@@ -9,12 +9,14 @@ const categories = require(`./categories/categories`);
 const articles = require(`./articles/articles`);
 const comments = require(`./comments/comments`);
 const search = require(`./search/search`);
+const user = require(`./user/user`);
 
 const {
   CategoryService,
   ArticleService,
   CommentService,
   SearchService,
+  UserService,
 } = require(`../data-service`);
 
 const app = new Router();
@@ -36,6 +38,7 @@ module.exports = async (logger) => {
     logger
   );
   search(app, new SearchService(sequelize), logger);
+  user(app, new UserService(sequelize), logger);
 
   return app;
 };

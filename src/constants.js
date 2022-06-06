@@ -29,6 +29,8 @@ module.exports.HttpMethod = {
   DELETE: `DELETE`,
 };
 
+module.exports.API_PREFIX = `/api`;
+
 module.exports.Article = {
   TITLE_MIN_LENGTH: 30,
   TITLE_MAX_LENGTH: 250,
@@ -68,6 +70,7 @@ module.exports.RouteParameter = {
   ARTICLE_ID_MIN: 1,
   COMMENT_ID_MIN: 1,
 };
+
 module.exports.RouteParameterMessage = {
   ARTICLE_ID_BASE: `Идентификатор ресурса должен быть натуральным числом`,
   ARTICLE_ID_MIN: `Идентификатор ресурса должен быть больше нуля`,
@@ -77,4 +80,21 @@ module.exports.RouteParameterMessage = {
   COMMENT_ID_INTEGER: `Идентификатор ресурса должен быть целым числом`,
 };
 
-module.exports.API_PREFIX = `/api`;
+module.exports.User = {
+  FIRST_NAME_REGEX: /^[A-zА-я]+$/,
+  LAST_NAME_REGEX: /^[A-zА-я]+$/,
+  PASSWORD_MIN_LENGTH: 10,
+};
+
+module.exports.UserMessage = {
+  FIRST_NAME_BASE: `Имя должно состоять только из букв, без специальных символов и пробелов`,
+  FIRST_NAME_REQUIRED: `Укажите ваше имя`,
+  LAST_NAME_BASE: `Фамилия должа состоять только из букв, без специальных символов и пробелов`,
+  LAST_NAME_REQUIRED: `Укажите вашу фамилию`,
+  EMAIL_STRING: `Некорректный E-mail, проверьте введенные данные`,
+  EMAIL_REQUIRED: `Укажите ваш E-mail`,
+  PASSWORD_MIN_LENGTH: `Пароль должен содержать не меньше ${module.exports.User.PASSWORD_MIN_LENGTH} символов`,
+  PASSWORD_REQUIRED: `Введите пароль`,
+  PASSWORD_ONLY: `Пароли не совпадают, проверьте введенные данные`,
+  EMAIL_UNIQUE: `Пользователь с таким адресом электронной почты уже зарегистирован`,
+};

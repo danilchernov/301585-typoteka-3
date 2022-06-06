@@ -2,6 +2,8 @@
 
 const { Router } = require(`express`);
 const { getApi } = require(`../api`);
+const { upload } = require(`../middlewares/multer`);
+
 const mainRoutes = new Router();
 
 const api = getApi();
@@ -35,7 +37,35 @@ mainRoutes.get(`/`, async (req, res, next) => {
 });
 
 mainRoutes.get(`/register`, (req, res) => {
-  return res.render(`views/main/register`);
+  const { user = null, validationMessages = null } = req.session;
+
+  req.session.user = null;
+  req.session.validationMessages = null;
+
+  return res.render(`views/main/register`, { user, validationMessages });
+});
+
+mainRoutes.post(`/register`, upload.single(`upload`), async (req, res) => {
+  const { body, file } = req;
+
+  const user = {
+    firstName: body.name,
+    lastName: body.surname,
+    email: body.email,
+    password: body.password,
+    repeatedPassword: body[`repeat-password`],
+    avatar: file ? file.filename : ``,
+  };
+
+  try {
+    await api.createUser(user);
+    return res.redirect(`/login`);
+  } catch (err) {
+    req.session.user = user;
+    req.session.validationMessages = err.response.data.validationMessages;
+
+    return res.redirect(`/register`);
+  }
 });
 
 mainRoutes.get(`/login`, (req, res) => {
@@ -47,7 +77,7 @@ mainRoutes.get(`/search`, async (req, res) => {
     const { query } = req.query;
     const results = await api.search(query);
     res.render(`views/main/search`, { searchText: query, results });
-  } catch (error) {
+  } catch (err) {
     res.render(`views/main/search`, { searchText: ``, results: [] });
   }
 });
