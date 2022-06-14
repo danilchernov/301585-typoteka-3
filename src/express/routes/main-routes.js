@@ -2,11 +2,12 @@
 
 const { Router } = require(`express`);
 const { getApi } = require(`../api`);
+
 const { upload } = require(`../middlewares/multer`);
 
-const mainRoutes = new Router();
-
 const api = getApi();
+
+const mainRoutes = new Router();
 
 const ARTICLES_PER_PAGE = 8;
 

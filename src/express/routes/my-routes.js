@@ -2,9 +2,14 @@
 
 const { Router } = require(`express`);
 const { getApi } = require(`../api`);
-const myRoutes = new Router();
+
+const isUserAdmin = require(`../middlewares/is-user-admin`);
 
 const api = getApi();
+
+const myRoutes = new Router();
+
+myRoutes.use(isUserAdmin);
 
 myRoutes.get(`/`, async (req, res) => {
   const articles = await api.getArticles();
