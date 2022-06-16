@@ -3,8 +3,11 @@
 const defineModels = require(`../models`);
 const Alias = require(`../models/alias`);
 
-module.exports = async (sequelize, { categories, articles }) => {
-  const { Category, Article } = defineModels(sequelize);
+module.exports = async (
+  sequelize,
+  { articles, categories, comments, users }
+) => {
+  const { Category, Article, Comment, User } = defineModels(sequelize);
   await sequelize.sync({ force: true });
 
   const categoryModels = await Category.bulkCreate(
@@ -19,6 +22,8 @@ module.exports = async (sequelize, { categories, articles }) => {
     {}
   );
 
+  await User.bulkCreate(users);
+
   const articlePromises = articles.map(async (article) => {
     const ArticleModel = await Article.create(article, {
       include: [Alias.COMMENTS],
@@ -29,4 +34,6 @@ module.exports = async (sequelize, { categories, articles }) => {
   });
 
   await Promise.all(articlePromises);
+
+  await Comment.bulkCreate(comments);
 };

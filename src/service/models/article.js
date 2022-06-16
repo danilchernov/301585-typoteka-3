@@ -50,6 +50,8 @@ const defineRelations = (models) => {
     through: models.ArticleCategory,
     as: Alias.CATEGORIES,
   });
+
+  Article.belongsTo(models.User, { as: Alias.USERS, foreignKey: `userId` });
 };
 
 module.exports = { define, defineRelations };
