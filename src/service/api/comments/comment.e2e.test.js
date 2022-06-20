@@ -18,6 +18,8 @@ const { HttpCode } = require(`../../../constants`);
 const {
   mockCategories,
   mockArticles,
+  mockComments,
+  mockUsers,
   mockArticleId,
   mockCommentId,
   mockValidComment,
@@ -26,7 +28,12 @@ const {
 
 const createApi = async () => {
   const mockDB = new Sequelize(`sqlite::memory:`, { logging: false });
-  await initDB(mockDB, { categories: mockCategories, articles: mockArticles });
+  await initDB(mockDB, {
+    categories: mockCategories,
+    articles: mockArticles,
+    comments: mockComments,
+    users: mockUsers,
+  });
 
   const app = express();
   const logger = getLogger();
