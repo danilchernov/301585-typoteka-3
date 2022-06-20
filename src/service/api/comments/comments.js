@@ -27,7 +27,8 @@ module.exports = (commentService, logger) => {
 
   route.post(`/`, isCommentValid, async (req, res) => {
     const { article } = res.locals;
-    const comment = await commentService.create(req.body, article.id);
+    const { userId } = req.query;
+    const comment = await commentService.create(article.id, userId, req.body);
 
     return res.status(HttpCode.CREATED).json(comment);
   });
