@@ -22,6 +22,9 @@ const FILE_IMAGES_PATH = `./data/images.txt`;
 const FILE_CATEGORIES_PATH = `./data/categories.txt`;
 const FILE_SENTENCES_PATH = `./data/sentences.txt`;
 const FILE_COMMENTS_PATH = `./data/comments.txt`;
+const FILE_NAMES_PATH = `./data/first-names.txt`;
+const FILE_SURNAMES_PATH = `./data/last-names.txt`;
+const FILE_EMAILS_PATH = `./data/emails.txt`;
 
 const ArticleLimit = {
   MIN: 1,
@@ -48,7 +51,17 @@ const CommentLimit = {
   MAX: 5,
 };
 
+const AvatarLimit = {
+  MIN: 1,
+  MAX: 5,
+};
+
+const UserLimit = {
+  MIN: 5,
+};
+
 const MONTH_PERIOD = 3;
+const DEFAULT_PASSWORD = `$2a$10$47Jc9oY.7eu.NnjaJ5wBbu.TvUbYkQSEpZcvB0v.sDDobGTR1/P6m`; // 1234567890
 
 const readContent = async (filePath) => {
   try {
@@ -59,6 +72,8 @@ const readContent = async (filePath) => {
     return [];
   }
 };
+
+const genetareAvatar = (id) => `avatar-${id}.png`;
 
 const generateTitle = (titles) => {
   return shuffle(titles)[getRandomInt(0, titles.length - 1)];
@@ -87,24 +102,52 @@ const generateCategories = (count = 1, categories) => {
   return shuffle(categories).slice(0, count);
 };
 
-const generateComments = (count = 1, comments) => {
+const generateUsers = (count = 1, firstNames, lastNames, emails) => {
   return Array(count)
     .fill({})
-    .map(() => {
-      return {
-        text: shuffle(comments).slice(0, getRandomInt(1, count)).join(` `),
-      };
-    });
+    .map((_, index) => ({
+      firstName: firstNames[getRandomInt(0, count - 1)],
+      lastName: lastNames[getRandomInt(0, count - 1)],
+      email: emails[index],
+      passwordHash: DEFAULT_PASSWORD,
+      avatar: genetareAvatar(getRandomInt(AvatarLimit.MIN, AvatarLimit.MAX)),
+      admin: index === 0,
+    }));
 };
 
-const generateArticles = (
-  count,
-  titles,
-  categories,
-  images,
-  sentences,
-  comments
+const generateArticleComments = (
+  count = 1,
+  articleId,
+  comments,
+  usersCount
 ) => {
+  return Array(count)
+    .fill({})
+    .map(() => ({
+      text: shuffle(comments)
+        .slice(0, getRandomInt(CommentLimit.MIN, CommentLimit.MAX))
+        .join(` `),
+      articleId,
+      userId: getRandomInt(1, usersCount),
+    }));
+};
+
+const generateComments = (count = 1, comments, usersCount) => {
+  return Array(count)
+    .fill()
+    .reduce((acc, _, index) => {
+      return acc.concat(
+        generateArticleComments(
+          getRandomInt(CommentLimit.MIN, CommentLimit.MAX),
+          index + 1,
+          comments,
+          usersCount
+        )
+      );
+    }, []);
+};
+
+const generateArticles = (count = 1, titles, categories, images, sentences) => {
   return Array(count)
     .fill({})
     .map(() => {
@@ -122,10 +165,6 @@ const generateArticles = (
         categories: generateCategories(
           getRandomInt(CategoryLimit.MIN, CategoryLimit.MAX),
           categories
-        ),
-        comments: generateComments(
-          getRandomInt(CommentLimit.MIN, CommentLimit.MAX),
-          comments
         ),
         date: generateDate(),
       };
@@ -158,17 +197,27 @@ module.exports = {
     const categories = await readContent(FILE_CATEGORIES_PATH);
     const images = await readContent(FILE_IMAGES_PATH);
     const sentences = await readContent(FILE_SENTENCES_PATH);
-    const comments = await readContent(FILE_COMMENTS_PATH);
+    const commentsSentences = await readContent(FILE_COMMENTS_PATH);
+    const firstNames = await readContent(FILE_NAMES_PATH);
+    const lastNames = await readContent(FILE_SURNAMES_PATH);
+    const emails = await readContent(FILE_EMAILS_PATH);
+
+    const users = generateUsers(UserLimit.MIN, firstNames, lastNames, emails);
 
     const articles = generateArticles(
       countArticles,
       titles,
       categories,
       images,
-      sentences,
-      comments
+      sentences
     );
 
-    return initDB(sequelize, { articles, categories });
+    const comments = generateComments(
+      countArticles,
+      commentsSentences,
+      UserLimit.MIN
+    );
+
+    return initDB(sequelize, { articles, categories, users, comments });
   },
 };

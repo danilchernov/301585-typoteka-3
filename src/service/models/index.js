@@ -13,12 +13,13 @@ const define = (sequelize) => {
   const ArticleCategory = ArticleCategoryModel.define(sequelize);
   const User = UserModel.define(sequelize);
 
-  [CategoryModel, CommentModel, ArticleModel].forEach((model) => {
+  [CategoryModel, CommentModel, ArticleModel, UserModel].forEach((model) => {
     return model.defineRelations({
       Category,
       Comment,
       Article,
       ArticleCategory,
+      User,
     });
   });
 
