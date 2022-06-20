@@ -11,6 +11,7 @@ block content
         h2.popup__title Войти
         .popup__form.form.form--log-in
           form(action='/login' method='POST' enctype="multipart/form-data" autocomplete="off")
+            input(type="hidden" name="csrf" value=csrfToken)
             .form__field
               label
                 input(type='email' name='email' value=`${email ? email: ''}` placeholder='Электронная почта' required)
