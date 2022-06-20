@@ -14,7 +14,7 @@ module.exports = (service, logger) => async (req, res, next) => {
 
     return res
       .status(HttpCode.BAD_REQUEST)
-      .json({ errorMessages: [UserMessage.EMAIL_UNIQUE] });
+      .json({ validationMessages: [UserMessage.EMAIL_UNIQUE] });
   }
 
   return next();
