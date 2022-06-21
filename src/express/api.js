@@ -53,15 +53,23 @@ class API {
     });
   }
 
-  async createComment(id, data) {
+  async createComment(id, userId, data) {
     return await this._load(`/articles/${id}/comments`, {
       method: HttpMethod.POST,
+      params: { userId },
       data,
     });
   }
 
   async createUser(data) {
     return await this._load(`/user`, {
+      method: HttpMethod.POST,
+      data,
+    });
+  }
+
+  async loginUser(data) {
+    return await this._load(`/user/login`, {
       method: HttpMethod.POST,
       data,
     });

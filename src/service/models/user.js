@@ -2,6 +2,8 @@
 
 const { Model, DataTypes } = require(`sequelize`);
 
+const Alias = require(`./alias`);
+
 class User extends Model {}
 
 const define = (sequelize) => {
@@ -40,4 +42,8 @@ const define = (sequelize) => {
   );
 };
 
-module.exports = { define };
+const defineRelations = (models) => {
+  User.hasMany(models.Comment, { as: Alias.COMMENTS, foreignKey: `userId` });
+};
+
+module.exports = { define, defineRelations };

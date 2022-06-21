@@ -12,24 +12,31 @@ const myRoutes = require(`./routes/my-routes`);
 const DEFAULT_PORT = 8080;
 const PUBLIC_DIR = `public`;
 const UPLOAD_DIR = `upload`;
+const TEMPLATES_DIR = `templates`;
 
 const app = express();
 
 app.use(
   session({
-    secret: process.env.SECRET,
+    secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
     name: `session_id`,
   })
 );
 
-app.set(`views`, path.resolve(__dirname, `templates`));
+app.use(express.static(path.resolve(__dirname, PUBLIC_DIR)));
+app.use(express.static(path.resolve(__dirname, UPLOAD_DIR)));
+
+app.set(`views`, path.resolve(__dirname, TEMPLATES_DIR));
 app.set(`view engine`, `pug`);
 app.locals.basedir = app.get(`views`);
 
-app.use(express.static(path.resolve(__dirname, PUBLIC_DIR)));
-app.use(express.static(path.resolve(__dirname, UPLOAD_DIR)));
+app.use((req, res, next) => {
+  res.locals.session = req.session;
+  next();
+});
+
 app.use(`/`, mainRoutes);
 app.use(`/articles`, articlesRoutes);
 app.use(`/my`, myRoutes);

@@ -1,0 +1,5 @@
+foo@gmail.com
+bar@mail.ru
+node@rumbler.ru
+js@outlook.com
+browser@yandex.ru

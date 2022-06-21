@@ -11,11 +11,16 @@ const user = require(`./user`);
 const DataService = require(`../../data-service/user`);
 
 const { HttpCode } = require(`../../../constants`);
-const { mockValidUser } = require(`./user.mock`);
+const { mockValidUser, mockValidAuthData } = require(`./user.mock`);
 
 const createApi = async () => {
   const mockDB = new Sequelize(`sqlite::memory:`, { logging: false });
-  await initDB(mockDB, { categories: [], articles: [] });
+  await initDB(mockDB, {
+    categories: [],
+    articles: [],
+    users: [],
+    comments: [],
+  });
 
   const app = express();
   const logger = getLogger();
@@ -113,4 +118,52 @@ test(`API will register the first user and assign him the administrator role`, a
     .post(`/user`)
     .send(secondUser)
     .expect((res) => expect(res.body.admin).toBe(false));
+});
+
+describe(`API authenticate user if data is valid`, () => {
+  let app;
+  let response;
+
+  beforeAll(async () => {
+    app = await createApi();
+    await request(app).post(`/user`).send(mockValidUser);
+
+    response = await request(app).post(`/user/login`).send(mockValidAuthData);
+  });
+
+  test(`Should return status code 200`, () => {
+    return expect(response.statusCode).toBe(HttpCode.OK);
+  });
+
+  test(`Should return an article with expected firstName`, () =>
+    expect(response.body.firstName).toBe(mockValidUser.firstName));
+});
+
+describe(`API refuses to authenticate user if data is invalid`, () => {
+  let app;
+
+  beforeAll(async () => {
+    app = await createApi();
+    await request(app).post(`/user`).send(mockValidUser);
+  });
+
+  test(`Should return status code 400 if email is incorrect`, async () => {
+    const badAuthData = { ...mockValidAuthData, email: `random@gmail.com` };
+
+    await request(app)
+      .post(`/user/login`)
+      .send(badAuthData)
+      .expect(HttpCode.BAD_REQUEST);
+  });
+
+  test(`Should return status code 400 if password does not match`, async () => {
+    const badAuthData = {
+      ...mockValidAuthData,
+      password: `randomPa$$w0Rd`,
+    };
+    await request(app)
+      .post(`/user/login`)
+      .send(badAuthData)
+      .expect(HttpCode.BAD_REQUEST);
+  });
 });

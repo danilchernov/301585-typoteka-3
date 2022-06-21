@@ -8,3 +8,8 @@ module.exports.mockValidUser = {
   repeatedPassword: `1234567890`,
   avatar: `avatar.jpg`,
 };
+
+module.exports.mockValidAuthData = {
+  email: `jaffathecake@gmail.com`,
+  password: `1234567890`,
+};

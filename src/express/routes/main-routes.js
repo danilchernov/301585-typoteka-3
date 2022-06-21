@@ -2,11 +2,13 @@
 
 const { Router } = require(`express`);
 const { getApi } = require(`../api`);
-const { upload } = require(`../middlewares/multer`);
 
-const mainRoutes = new Router();
+const { upload } = require(`../middlewares/multer`);
+const csrfProtection = require(`../middlewares/csrf-protection`);
 
 const api = getApi();
+
+const mainRoutes = new Router();
 
 const ARTICLES_PER_PAGE = 8;
 
@@ -36,41 +38,86 @@ mainRoutes.get(`/`, async (req, res, next) => {
   }
 });
 
-mainRoutes.get(`/register`, (req, res) => {
+mainRoutes.get(`/register`, csrfProtection, (req, res) => {
   const { user = null, validationMessages = null } = req.session;
+  const csrfToken = req.csrfToken();
 
   req.session.user = null;
   req.session.validationMessages = null;
 
-  return res.render(`views/main/register`, { user, validationMessages });
+  return res.render(`views/main/register`, {
+    user,
+    validationMessages,
+    csrfToken,
+  });
 });
 
-mainRoutes.post(`/register`, upload.single(`upload`), async (req, res) => {
-  const { body, file } = req;
+mainRoutes.post(
+  `/register`,
+  [upload.single(`upload`), csrfProtection],
+  async (req, res) => {
+    const { body, file } = req;
 
-  const user = {
-    firstName: body.name,
-    lastName: body.surname,
-    email: body.email,
-    password: body.password,
-    repeatedPassword: body[`repeat-password`],
-    avatar: file ? file.filename : ``,
-  };
+    const user = {
+      firstName: body.name,
+      lastName: body.surname,
+      email: body.email,
+      password: body.password,
+      repeatedPassword: body[`repeat-password`],
+      avatar: file ? file.filename : ``,
+    };
 
-  try {
-    await api.createUser(user);
-    return res.redirect(`/login`);
-  } catch (err) {
-    req.session.user = user;
-    req.session.validationMessages = err.response.data.validationMessages;
+    try {
+      await api.createUser(user);
+      return res.redirect(`/login`);
+    } catch (err) {
+      req.session.user = user;
+      req.session.validationMessages = err.response.data.validationMessages;
 
-    return res.redirect(`/register`);
+      return res.redirect(`/register`);
+    }
   }
+);
+
+mainRoutes.get(`/login`, csrfProtection, (req, res) => {
+  const { email, password, validationMessages } = req.session;
+  const csrfToken = req.csrfToken();
+
+  req.session.email = null;
+  req.session.password = null;
+
+  return res.render(`views/main/login`, {
+    email,
+    password,
+    validationMessages,
+    csrfToken,
+  });
 });
 
-mainRoutes.get(`/login`, (req, res) => {
-  return res.render(`views/main/login`);
-});
+mainRoutes.post(
+  `/login`,
+  [upload.single(`upload`), csrfProtection],
+  async (req, res) => {
+    const { body } = req;
+
+    const data = {
+      email: body.email,
+      password: body.password,
+    };
+
+    try {
+      const user = await api.loginUser(data);
+      req.session.loggedUser = user;
+      return res.redirect(`/`);
+    } catch (err) {
+      req.session.email = data.email;
+      req.session.password = data.password;
+      req.session.validationMessages = err.response.data.validationMessages;
+
+      return res.redirect(`/login`);
+    }
+  }
+);
 
 mainRoutes.get(`/search`, async (req, res) => {
   try {
@@ -80,6 +127,10 @@ mainRoutes.get(`/search`, async (req, res) => {
   } catch (err) {
     res.render(`views/main/search`, { searchText: ``, results: [] });
   }
+});
+
+mainRoutes.get(`/logout`, (req, res) => {
+  req.session.destroy(() => res.redirect(`/login`));
 });
 
 module.exports = mainRoutes;

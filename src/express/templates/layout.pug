@@ -2,7 +2,9 @@ include /utils
 include /mixins/index
 
 block variables
-  - let isAuthorized = false;
+  - const loggedUser = session.loggedUser;
+  - const isAdmin = loggedUser && loggedUser.admin;
+
   - let bodyClasses = ['wrapper'];
 
 doctype html

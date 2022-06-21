@@ -1,8 +1,5 @@
 extend /layout
 
-append variables
-  - isAuthorized = true
-
 block content
   main
     section.post
@@ -43,21 +40,23 @@ block content
               each comment in article.comments
                 li.comments__comment
                   .comments__avatar.avatar
-                    img(src="/img/avatar-1.png" alt="Аватар пользователя")
+                    img(src=`/img/${comment.users.avatar}` alt="Аватар пользователя")
                   .comments__text
                     .comments__head
-                      p Евгений Петров •
+                      p #{comment.users.firstName} #{comment.users.lastName} •
                       +date(comment.createdAt)(class=`comments__date`)
                     p.comments__message #{comment.text}
 
-          .comments__footer.comments__footer--user
-            form(action=`/articles/${article.id}` method="POST" enctype="multipart/form-data" autocomplete="off")
-              .comments__avatar.avatar
-                img(src="/img/avatar-1.png" alt="Аватар пользователя")
-              label
-                textarea(rows="1", name="message", placeholder="Присоединиться к обсуждению")
-              button.comments__button.button.button--colored(type="submit") Опубликовать
-            if validationMessages
-              each error in validationMessages
-                p.comments__error #{error}
+          if loggedUser
+            .comments__footer.comments__footer--user
+              form(action=`/articles/${article.id}` method="POST" enctype="multipart/form-data" autocomplete="off")
+                .comments__avatar.avatar
+                  if loggedUser.avatar
+                    img(src=`/img/${loggedUser.avatar}` alt="Аватар пользователя")
+                label
+                  textarea(rows="1", name="message", placeholder="Присоединиться к обсуждению")
+                button.comments__button.button.button--colored(type="submit") Опубликовать
+              if validationMessages
+                each error in validationMessages
+                  p.comments__error #{error}
 
