@@ -65,12 +65,12 @@ describe(`API returns a list of comments for the specified article`, () => {
     expect(response.statusCode).toBe(HttpCode.OK);
   });
 
-  test(`Should return a list of 2 comments`, () => {
-    expect(response.body.length).toBe(2);
+  test(`Should return a list of 3 comments`, () => {
+    expect(response.body.length).toBe(3);
   });
 
   test(`Should return comment with expected text"`, () => {
-    const EXPECTED_TEXT = `С чем связана продажа? Почему так дешёво?`;
+    const EXPECTED_TEXT = `А где блок питания? Неплохо, но дорого. А сколько игр в комплекте? Совсем немного... Вы что?! В магазине дешевле.`;
     expect(response.body[0].text).toBe(EXPECTED_TEXT);
   });
 });
@@ -105,7 +105,7 @@ describe(`API creates an comment if the passed data is valid`, () => {
   test(`Should increase the number of comments by 1`, () =>
     request(app)
       .get(`/articles/${mockArticleId}/comments`)
-      .expect((res) => expect(res.body.length).toBe(3)));
+      .expect((res) => expect(res.body.length).toBe(4)));
 });
 
 describe(`API does not create a comment if the passed data is invalid`, () => {
@@ -168,10 +168,10 @@ describe(`API correctly deletes a comment`, () => {
 
   test(`Should return true`, () => expect(response.body).toBe(true));
 
-  test(`Should decrease the number of articles by 1`, () =>
+  test(`Should decrease the number of comments by 1`, () =>
     request(app)
       .get(`/articles/${mockArticleId}/comments`)
-      .expect((res) => expect(res.body.length).toBe(1)));
+      .expect((res) => expect(res.body.length).toBe(2)));
 });
 
 test(`API returns status code 404 when trying to delete non-existent comment`, async () => {

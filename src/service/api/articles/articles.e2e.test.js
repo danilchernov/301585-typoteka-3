@@ -18,8 +18,6 @@ const { HttpCode } = require(`../../../constants`);
 const {
   mockCategories,
   mockArticles,
-  mockComments,
-  mockUsers,
   mockArticleId,
   mockValidArticle,
   mockInvalidArticle,
@@ -30,8 +28,6 @@ const createApi = async () => {
   await initDB(mockDB, {
     categories: mockCategories,
     articles: mockArticles,
-    comments: mockComments,
-    users: mockUsers,
   });
 
   const app = express();
