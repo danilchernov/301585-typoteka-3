@@ -15,7 +15,12 @@ const { mockValidUser, mockValidAuthData } = require(`./user.mock`);
 
 const createApi = async () => {
   const mockDB = new Sequelize(`sqlite::memory:`, { logging: false });
-  await initDB(mockDB, { categories: [], articles: [] });
+  await initDB(mockDB, {
+    categories: [],
+    articles: [],
+    users: [],
+    comments: [],
+  });
 
   const app = express();
   const logger = getLogger();
@@ -142,16 +147,16 @@ describe(`API refuses to authenticate user if data is invalid`, () => {
     await request(app).post(`/user`).send(mockValidUser);
   });
 
-  test(`Should return status code 401 if email is incorrect`, async () => {
+  test(`Should return status code 400 if email is incorrect`, async () => {
     const badAuthData = { ...mockValidAuthData, email: `random@gmail.com` };
 
     await request(app)
       .post(`/user/login`)
       .send(badAuthData)
-      .expect(HttpCode.UNAUTHORIZED);
+      .expect(HttpCode.BAD_REQUEST);
   });
 
-  test(`Should return status code 401 if password does not match`, async () => {
+  test(`Should return status code 400 if password does not match`, async () => {
     const badAuthData = {
       ...mockValidAuthData,
       password: `randomPa$$w0Rd`,
@@ -159,6 +164,6 @@ describe(`API refuses to authenticate user if data is invalid`, () => {
     await request(app)
       .post(`/user/login`)
       .send(badAuthData)
-      .expect(HttpCode.UNAUTHORIZED);
+      .expect(HttpCode.BAD_REQUEST);
   });
 });

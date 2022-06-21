@@ -35,5 +35,9 @@ module.exports = async (
 
   await Promise.all(articlePromises);
 
-  await Comment.bulkCreate(comments);
+  try {
+    await Comment.bulkCreate(comments);
+  } catch (err) {
+    console.log(`🚀 ~ file: init-db.js ~ line 41 ~ err`, err);
+  }
 };
