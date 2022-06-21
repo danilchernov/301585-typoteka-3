@@ -21,7 +21,19 @@ class ArticleService {
   }
 
   async findOne(id, { comments } = {}) {
-    const include = [Alias.CATEGORIES, ...(comments ? [Alias.COMMENTS] : [])];
+    const include = [
+      Alias.CATEGORIES,
+      ...(comments
+        ? [
+            Alias.COMMENTS,
+            {
+              model: this._Comment,
+              as: Alias.COMMENTS,
+              include: [Alias.USERS],
+            },
+          ]
+        : []),
+    ];
 
     return this._Article.findByPk(id, { include });
   }

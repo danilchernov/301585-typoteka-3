@@ -151,6 +151,7 @@ articlesRoutes.post(
   `/:id`,
   [isUserLogged, upload.single(`upload`)],
   async (req, res) => {
+    const { loggedUser } = req.session;
     const { id } = req.params;
     const { body } = req;
 
@@ -159,7 +160,7 @@ articlesRoutes.post(
     };
 
     try {
-      await api.createComment(id, comment);
+      await api.createComment(id, loggedUser.id, comment);
       return res.redirect(`back`);
     } catch (err) {
       req.session.validationMessages = err.response.data.validationMessages;

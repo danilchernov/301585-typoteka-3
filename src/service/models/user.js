@@ -43,7 +43,6 @@ const define = (sequelize) => {
 };
 
 const defineRelations = (models) => {
-  User.hasMany(models.Article, { as: Alias.ARTICLES, foreignKey: `userId` });
   User.hasMany(models.Comment, { as: Alias.COMMENTS, foreignKey: `userId` });
 };
 
