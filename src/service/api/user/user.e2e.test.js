@@ -135,7 +135,7 @@ describe(`API authenticate user if data is valid`, () => {
     return expect(response.statusCode).toBe(HttpCode.OK);
   });
 
-  test(`Should return an article with expected firstName`, () =>
+  test(`Should return an user with expected firstName`, () =>
     expect(response.body.firstName).toBe(mockValidUser.firstName));
 });
 
