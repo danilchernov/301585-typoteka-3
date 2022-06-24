@@ -1,6 +1,6 @@
 "use strict";
 
-const passwordUtils = require(`../lib/password`);
+const passwordUtils = require(`../../lib/password`);
 
 class UserService {
   constructor(sequelize) {
