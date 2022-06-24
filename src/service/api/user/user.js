@@ -2,6 +2,7 @@
 
 const { Router } = require(`express`);
 const { HttpCode } = require(`../../../constants`);
+const jwtUtils = require(`../../../lib/jwt`);
 
 const userExists = require(`../../middlewares/user-exists`);
 const userSchema = require(`../../schemas/user`);
@@ -29,6 +30,9 @@ module.exports = (api, service, logger) => {
 
   route.post(`/login`, [isLoginDataValid, isUserAuthenticated], (req, res) => {
     const { user } = res.locals;
-    return res.status(HttpCode.OK).json(user);
+
+    const token = jwtUtils.generateAccessToken(user);
+
+    return res.status(HttpCode.OK).json(token);
   });
 };

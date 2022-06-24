@@ -5,7 +5,7 @@
   "main": "./src/service/service.js",
   "scripts": {
     "test": "npm run eslint && npm run jest",
-    "jest": "cross-env NODE_ENV=test jest",
+    "jest": "jest",
     "eslint": "eslint --ext .js src/",
     "eslint:fix": "npm run eslint -- --fix",
     "prettier": "prettier  src/ --check",
