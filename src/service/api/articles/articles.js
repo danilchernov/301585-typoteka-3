@@ -3,6 +3,8 @@
 const { Router } = require(`express`);
 const { HttpCode } = require(`../../../constants`);
 
+const authenticateJwt = require(`../../middlewares/authenticate-jwt`);
+
 const routeParameterValidator = require(`../../middlewares/route-parameter-validator`);
 const routeParameterSchema = require(`../../schemas/route-parameter`);
 
@@ -36,9 +38,8 @@ module.exports = (
 
   route.get(`/`, async (req, res) => {
     const { comments = false, limit = null, offset = null } = req.query;
-    let result;
 
-    result =
+    const result =
       limit || offset
         ? await articleService.findPage({ limit, offset, comments })
         : await articleService.findAll({ comments });
@@ -46,7 +47,7 @@ module.exports = (
     return res.status(HttpCode.OK).json(result);
   });
 
-  route.post(`/`, isArticleValid, async (req, res) => {
+  route.post(`/`, [authenticateJwt, isArticleValid], async (req, res) => {
     const article = await articleService.create(req.body);
 
     return res.status(HttpCode.CREATED).json(article);
@@ -60,7 +61,7 @@ module.exports = (
 
   route.put(
     `/:articleId`,
-    [isArticleExists, isArticleValid],
+    [authenticateJwt, isArticleExists, isArticleValid],
     async (req, res) => {
       const { article } = res.locals;
       const updatedArticle = await articleService.update(article.id, req.body);
@@ -69,10 +70,14 @@ module.exports = (
     }
   );
 
-  route.delete(`/:articleId`, isArticleExists, async (req, res) => {
-    const { article } = res.locals;
-    const deletedArticle = await articleService.delete(article.id);
+  route.delete(
+    `/:articleId`,
+    [authenticateJwt, isArticleExists],
+    async (req, res) => {
+      const { article } = res.locals;
+      const deletedArticle = await articleService.delete(article.id);
 
-    return res.status(HttpCode.OK).json(deletedArticle);
-  });
+      return res.status(HttpCode.OK).json(deletedArticle);
+    }
+  );
 };

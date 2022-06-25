@@ -93,3 +93,20 @@ module.exports.mockInvalidArticle = {
     `Программирование`,
   ],
 };
+
+module.exports.mockUsers = [
+  {
+    id: 1,
+    firstName: `Андрей`,
+    lastName: `Чернов`,
+    email: `foo@gmail.com`,
+    passwordHash: `$2a$10$47Jc9oY.7eu.NnjaJ5wBbu.TvUbYkQSEpZcvB0v.sDDobGTR1/P6m`,
+    avatar: `avatar-5.png`,
+    admin: true,
+  },
+];
+
+module.exports.mockValidAuthData = {
+  email: `foo@gmail.com`,
+  password: `1234567890`,
+};
