@@ -4,6 +4,7 @@ const { Router } = require(`express`);
 const { HttpCode } = require(`../../../constants`);
 
 const authenticateJwt = require(`../../middlewares/authenticate-jwt`);
+const isUserAdmin = require(`../../middlewares/is-user-admin`);
 
 const routeParameterValidator = require(`../../middlewares/route-parameter-validator`);
 const routeParameterSchema = require(`../../schemas/route-parameter`);
@@ -26,17 +27,25 @@ module.exports = (commentService, logger) => {
     return res.status(HttpCode.OK).json(comments);
   });
 
-  route.post(`/`, [authenticateJwt, isCommentValid], async (req, res) => {
-    const { user, article } = res.locals;
+  route.post(
+    `/`,
+    [authenticateJwt, isUserAdmin, isCommentValid],
+    async (req, res) => {
+      const { user, article } = res.locals;
 
-    const comment = await commentService.create(article.id, user.id, req.body);
+      const comment = await commentService.create(
+        article.id,
+        user.id,
+        req.body
+      );
 
-    return res.status(HttpCode.CREATED).json(comment);
-  });
+      return res.status(HttpCode.CREATED).json(comment);
+    }
+  );
 
   route.delete(
     `/:commentId`,
-    [authenticateJwt, isRouteParameterValid],
+    [authenticateJwt, isUserAdmin, isRouteParameterValid],
     async (req, res) => {
       const { commentId } = req.params;
       const deletedComment = await commentService.delete(commentId);

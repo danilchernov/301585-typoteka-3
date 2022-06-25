@@ -4,6 +4,7 @@ const { Router } = require(`express`);
 const { HttpCode } = require(`../../../constants`);
 
 const authenticateJwt = require(`../../middlewares/authenticate-jwt`);
+const isUserAdmin = require(`../../middlewares/is-user-admin`);
 
 const routeParameterValidator = require(`../../middlewares/route-parameter-validator`);
 const routeParameterSchema = require(`../../schemas/route-parameter`);
@@ -33,7 +34,6 @@ module.exports = (
   );
 
   api.use(`/articles`, route);
-  route.use(`/:articleId`, isRouteParameterValid);
   route.use(`/:articleId/comments`, isArticleExists, commentsRouter);
 
   route.get(`/`, async (req, res) => {
@@ -47,21 +47,35 @@ module.exports = (
     return res.status(HttpCode.OK).json(result);
   });
 
-  route.post(`/`, [authenticateJwt, isArticleValid], async (req, res) => {
-    const article = await articleService.create(req.body);
+  route.post(
+    `/`,
+    [authenticateJwt, isUserAdmin, isArticleValid],
+    async (req, res) => {
+      const article = await articleService.create(req.body);
 
-    return res.status(HttpCode.CREATED).json(article);
-  });
+      return res.status(HttpCode.CREATED).json(article);
+    }
+  );
 
-  route.get(`/:articleId`, isArticleExists, async (req, res) => {
-    const { article } = res.locals;
+  route.get(
+    `/:articleId`,
+    [isRouteParameterValid, isArticleExists],
+    async (req, res) => {
+      const { article } = res.locals;
 
-    return res.status(HttpCode.OK).json(article);
-  });
+      return res.status(HttpCode.OK).json(article);
+    }
+  );
 
   route.put(
     `/:articleId`,
-    [authenticateJwt, isArticleExists, isArticleValid],
+    [
+      authenticateJwt,
+      isUserAdmin,
+      isRouteParameterValid,
+      isArticleExists,
+      isArticleValid,
+    ],
     async (req, res) => {
       const { article } = res.locals;
       const updatedArticle = await articleService.update(article.id, req.body);
@@ -72,7 +86,7 @@ module.exports = (
 
   route.delete(
     `/:articleId`,
-    [authenticateJwt, isArticleExists],
+    [authenticateJwt, isUserAdmin, isRouteParameterValid, isArticleExists],
     async (req, res) => {
       const { article } = res.locals;
       const deletedArticle = await articleService.delete(article.id);

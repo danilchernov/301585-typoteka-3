@@ -23,7 +23,8 @@ const {
   mockArticles,
   mockComments,
   mockUsers,
-  mockValidAuthData,
+  mockAdminAuthData,
+  mockAuthData,
   mockArticleId,
   mockCommentId,
   mockValidComment,
@@ -61,15 +62,17 @@ const createApi = async () => {
   return app;
 };
 
-// eslint-disable-next-line no-unused-vars
+let adminToken;
 let token;
 
 beforeAll(async () => {
   const app = await createApi();
-  const loginResponse = await request(app)
-    .post(`/user/login`)
-    .send(mockValidAuthData);
+  const [adminLoginResponse, loginResponse] = await Promise.all([
+    await request(app).post(`/user/login`).send(mockAdminAuthData),
+    await request(app).post(`/user/login`).send(mockAuthData),
+  ]);
 
+  adminToken = adminLoginResponse.body;
   token = loginResponse.body;
 });
 
@@ -112,7 +115,7 @@ describe(`API creates an comment if the passed data is valid`, () => {
     app = await createApi();
     response = await request(app)
       .post(`/articles/${mockArticleId}/comments`)
-      .set(`Authorization`, token)
+      .set(`Authorization`, adminToken)
       .send(mockValidComment);
   });
 
@@ -140,7 +143,7 @@ describe(`API does not create a comment if the passed data is invalid`, () => {
   test(`Should return status code 400 without any required properties`, async () => {
     return request(app)
       .post(`/articles/${mockArticleId}/comments`)
-      .set(`Authorization`, token)
+      .set(`Authorization`, adminToken)
       .send(mockInvalidComment)
       .expect(HttpCode.BAD_REQUEST);
   });
@@ -150,7 +153,7 @@ describe(`API does not create a comment if the passed data is invalid`, () => {
     for (const badComment of badComments) {
       await request(app)
         .post(`/articles/${mockArticleId}/comments`)
-        .set(`Authorization`, token)
+        .set(`Authorization`, adminToken)
         .send(badComment)
         .expect(HttpCode.BAD_REQUEST);
     }
@@ -161,7 +164,7 @@ describe(`API does not create a comment if the passed data is invalid`, () => {
     for (const badComment of badComments) {
       await request(app)
         .post(`/articles/${mockArticleId}/comments`)
-        .set(`Authorization`, token)
+        .set(`Authorization`, adminToken)
         .send(badComment)
         .expect(HttpCode.BAD_REQUEST);
     }
@@ -173,7 +176,7 @@ test(`API returns status code 404 when trying to add a comment to a non-existent
 
   return request(app)
     .post(`/articles/12345/comments`)
-    .set(`Authorization`, token)
+    .set(`Authorization`, adminToken)
     .send(mockValidComment)
     .expect(HttpCode.NOT_FOUND);
 });
@@ -186,7 +189,7 @@ describe(`API correctly deletes a comment`, () => {
     app = await createApi();
     response = await request(app)
       .delete(`/articles/${mockArticleId}/comments/${mockCommentId}`)
-      .set(`Authorization`, token);
+      .set(`Authorization`, adminToken);
   });
 
   test(`Should return status code 200`, () =>
@@ -205,7 +208,7 @@ test(`API returns status code 404 when trying to delete non-existent comment`, a
 
   return request(app)
     .delete(`/articles/${mockArticleId}/comments/12345`)
-    .set(`Authorization`, token)
+    .set(`Authorization`, adminToken)
     .expect(HttpCode.NOT_FOUND);
 });
 
@@ -214,7 +217,7 @@ test(`API returns 404 status code when trying to remove a comment from a non-exi
 
   return request(app)
     .delete(`/articles/${mockArticleId}/comments/12345`)
-    .set(`Authorization`, token)
+    .set(`Authorization`, adminToken)
     .expect(HttpCode.NOT_FOUND);
 });
 
@@ -223,11 +226,11 @@ test(`API returns status code 400 if an invalid type was passed when trying to i
 
   await request(app)
     .delete(`/articles/${mockArticleId}/comments/id`)
-    .set(`Authorization`, token)
+    .set(`Authorization`, adminToken)
     .expect(HttpCode.BAD_REQUEST);
 });
 
-test(`API will return status code 401 if a user without a JWT token tries to interact with comments`, async () => {
+test(`API returns status code 401 if a user without a JWT adminToken tries to interact with comments`, async () => {
   const app = await createApi();
 
   await request(app)
@@ -238,4 +241,19 @@ test(`API will return status code 401 if a user without a JWT token tries to int
   await request(app)
     .delete(`/articles/${mockArticleId}/comments/${mockCommentId}`)
     .expect(HttpCode.UNAUTHORIZED);
+});
+
+test(`API returns status code 403 if user does not have permission to interact with articles`, async () => {
+  const app = await createApi();
+
+  await request(app)
+    .post(`/articles/${mockArticleId}/comments`)
+    .set(`Authorization`, token)
+    .send(mockValidComment)
+    .expect(HttpCode.FORBIDDEN);
+
+  await request(app)
+    .delete(`/articles/${mockArticleId}/comments/${mockCommentId}`)
+    .set(`Authorization`, token)
+    .expect(HttpCode.FORBIDDEN);
 });

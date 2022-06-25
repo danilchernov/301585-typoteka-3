@@ -104,9 +104,23 @@ module.exports.mockUsers = [
     avatar: `avatar-5.png`,
     admin: true,
   },
+  {
+    id: 2,
+    firstName: `Данил`,
+    lastName: `Беллер`,
+    email: `bar@mail.ru`,
+    passwordHash: `$2a$10$47Jc9oY.7eu.NnjaJ5wBbu.TvUbYkQSEpZcvB0v.sDDobGTR1/P6m`,
+    avatar: `avatar-5.png`,
+    admin: false,
+  },
 ];
 
-module.exports.mockValidAuthData = {
+module.exports.mockAdminAuthData = {
   email: `foo@gmail.com`,
+  password: `1234567890`,
+};
+
+module.exports.mockAuthData = {
+  email: `bar@mail.ru`,
   password: `1234567890`,
 };

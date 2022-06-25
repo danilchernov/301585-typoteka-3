@@ -17,6 +17,6 @@ module.exports = async (req, res, next) => {
 
     return next();
   } catch (err) {
-    return res.sendStatus(HttpCode.FORBIDDEN);
+    return res.sendStatus(HttpCode.UNAUTHORIZED);
   }
 };
