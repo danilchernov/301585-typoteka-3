@@ -10,7 +10,7 @@ const initDB = require(`../../lib/init-db`);
 const { getLogger } = require(`../../lib/logger`);
 
 const user = require(`./user`);
-const DataService = require(`../../data-service/user`);
+const UserService = require(`../../data-service/user`);
 
 const { HttpCode } = require(`../../../constants`);
 const { mockValidUser, mockValidAuthData } = require(`./user.mock`);
@@ -30,7 +30,7 @@ const createApi = async () => {
   const logger = getLogger();
   app.use(express.json());
 
-  user(app, new DataService(mockDB), logger);
+  user({ app, userService: new UserService(mockDB), logger });
 
   return app;
 };

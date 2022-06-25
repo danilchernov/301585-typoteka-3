@@ -13,18 +13,18 @@ const loginDataValidator = require(`../../middlewares/login-data-validator`);
 
 const authenticate = require(`../../middlewares/authenticate`);
 
-module.exports = (api, service, logger) => {
+module.exports = ({ app, userService, logger } = {}) => {
   const route = new Router();
 
-  const isUserExists = userExists(service, logger);
+  const isUserExists = userExists(userService, logger);
   const isUserValid = userValidator(userSchema, logger);
   const isLoginDataValid = loginDataValidator(loginDataSchema, logger);
-  const isUserAuthenticated = authenticate(service, logger);
+  const isUserAuthenticated = authenticate(userService, logger);
 
-  api.use(`/user`, route);
+  app.use(`/user`, route);
 
   route.post(`/`, [isUserValid, isUserExists], async (req, res) => {
-    const user = await service.create(req.body);
+    const user = await userService.create(req.body);
     return res.status(HttpCode.CREATED).json(user);
   });
 

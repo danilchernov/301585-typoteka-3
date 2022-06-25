@@ -9,27 +9,38 @@ const isUserAdmin = require(`../../middlewares/is-user-admin`);
 const routeParameterValidator = require(`../../middlewares/route-parameter-validator`);
 const routeParameterSchema = require(`../../schemas/route-parameter`);
 
+const articleExists = require(`../../middlewares/article-exists`);
+
 const commentValidator = require(`../../middlewares/comment-validator`);
 const commentSchema = require(`../../schemas/comment`);
 
-module.exports = (commentService, logger) => {
+module.exports = ({ app, articleService, commentService, logger } = {}) => {
   const route = new Router({ mergeParams: true });
+
+  app.use(`/`, route);
 
   const isRouteParameterValid = routeParameterValidator(
     routeParameterSchema,
     logger
   );
+
+  const isArticleExists = articleExists(articleService, logger);
+
   const isCommentValid = commentValidator(commentSchema, logger);
 
-  route.get(`/`, async (req, res) => {
-    const { article } = res.locals;
-    const comments = await commentService.findAll(article.id);
-    return res.status(HttpCode.OK).json(comments);
-  });
+  route.get(
+    `/articles/:articleId/comments`,
+    [isRouteParameterValid, isArticleExists],
+    async (req, res) => {
+      const { article } = res.locals;
+      const comments = await commentService.findAll(article.id);
+      return res.status(HttpCode.OK).json(comments);
+    }
+  );
 
   route.post(
-    `/`,
-    [authenticateJwt, isUserAdmin, isCommentValid],
+    `/articles/:articleId/comments`,
+    [authenticateJwt, isUserAdmin, isArticleExists, isCommentValid],
     async (req, res) => {
       const { user, article } = res.locals;
 
@@ -44,8 +55,8 @@ module.exports = (commentService, logger) => {
   );
 
   route.delete(
-    `/:commentId`,
-    [authenticateJwt, isUserAdmin, isRouteParameterValid],
+    `/articles/:articleId/comments/:commentId`,
+    [authenticateJwt, isUserAdmin, isRouteParameterValid, isArticleExists],
     async (req, res) => {
       const { commentId } = req.params;
       const deletedComment = await commentService.delete(commentId);

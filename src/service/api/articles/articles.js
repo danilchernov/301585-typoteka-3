@@ -13,13 +13,7 @@ const articleExists = require(`../../middlewares/article-exists`);
 const articleValidator = require(`../../middlewares/article-validator`);
 const articleSchema = require(`../../schemas/article`);
 
-module.exports = (
-  api,
-  articleService,
-  CategoryService,
-  commentsRouter,
-  logger
-) => {
+module.exports = ({ app, articleService, categoryService, logger } = {}) => {
   const route = new Router();
 
   const isRouteParameterValid = routeParameterValidator(
@@ -27,14 +21,14 @@ module.exports = (
     logger
   );
   const isArticleExists = articleExists(articleService, logger);
+
   const isArticleValid = articleValidator(
     articleSchema,
-    CategoryService,
+    categoryService,
     logger
   );
 
-  api.use(`/articles`, route);
-  route.use(`/:articleId/comments`, isArticleExists, commentsRouter);
+  app.use(`/articles`, route);
 
   route.get(`/`, async (req, res) => {
     const { comments = false, limit = null, offset = null } = req.query;

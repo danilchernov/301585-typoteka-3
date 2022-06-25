@@ -4,12 +4,12 @@ const { Router } = require(`express`);
 const { HttpCode } = require(`../../../constants`);
 const route = new Router();
 
-module.exports = (api, service) => {
-  api.use(`/categories`, route);
+module.exports = ({ app, categoryService } = {}) => {
+  app.use(`/categories`, route);
 
   route.get(`/`, async (req, res) => {
     const { count = false } = req.query;
-    const categories = await service.findAll({ count });
+    const categories = await categoryService.findAll({ count });
 
     return res.status(HttpCode.OK).json(categories);
   });

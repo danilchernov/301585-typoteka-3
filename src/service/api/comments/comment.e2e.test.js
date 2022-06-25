@@ -11,7 +11,7 @@ const articles = require(`../articles/articles`);
 const comments = require(`./comments`);
 const user = require(`../user/user`);
 
-const DataService = require(`../../data-service/article`);
+const ArticleService = require(`../../data-service/article`);
 const CategoryService = require(`../../data-service/category`);
 const CommentService = require(`../../data-service/comment`);
 const UserService = require(`../../data-service/user`);
@@ -44,20 +44,23 @@ const createApi = async () => {
 
   const app = express();
   const logger = getLogger();
-
   app.use(express.json());
 
-  const articlesCommentsRouter = comments(new CommentService(mockDB), logger);
-
-  articles(
+  articles({
     app,
-    new DataService(mockDB),
-    new CategoryService(mockDB),
-    articlesCommentsRouter,
-    logger
-  );
+    articleService: new ArticleService(mockDB),
+    categoryService: new CategoryService(mockDB),
+    logger,
+  });
 
-  user(app, new UserService(mockDB), logger);
+  comments({
+    app,
+    articleService: new ArticleService(mockDB),
+    commentService: new CommentService(mockDB),
+    logger,
+  });
+
+  user({ app, userService: new UserService(mockDB), logger });
 
   return app;
 };
