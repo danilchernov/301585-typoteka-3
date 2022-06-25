@@ -9,9 +9,12 @@ const { getLogger } = require(`../../lib/logger`);
 
 const articles = require(`../articles/articles`);
 const comments = require(`./comments`);
+const user = require(`../user/user`);
+
 const DataService = require(`../../data-service/article`);
 const CategoryService = require(`../../data-service/category`);
 const CommentService = require(`../../data-service/comment`);
+const UserService = require(`../../data-service/user`);
 
 const { HttpCode } = require(`../../../constants`);
 
@@ -20,11 +23,14 @@ const {
   mockArticles,
   mockComments,
   mockUsers,
+  mockValidAuthData,
   mockArticleId,
   mockCommentId,
   mockValidComment,
   mockInvalidComment,
 } = require(`./comments.mock`);
+
+process.env.JWT_SECRET = `jwt_secret`;
 
 const createApi = async () => {
   const mockDB = new Sequelize(`sqlite::memory:`, { logging: false });
@@ -41,6 +47,7 @@ const createApi = async () => {
   app.use(express.json());
 
   const articlesCommentsRouter = comments(new CommentService(mockDB), logger);
+
   articles(
     app,
     new DataService(mockDB),
@@ -49,8 +56,22 @@ const createApi = async () => {
     logger
   );
 
+  user(app, new UserService(mockDB), logger);
+
   return app;
 };
+
+// eslint-disable-next-line no-unused-vars
+let token;
+
+beforeAll(async () => {
+  const app = await createApi();
+  const loginResponse = await request(app)
+    .post(`/user/login`)
+    .send(mockValidAuthData);
+
+  token = loginResponse.body;
+});
 
 describe(`API returns a list of comments for the specified article`, () => {
   let app;
@@ -91,6 +112,7 @@ describe(`API creates an comment if the passed data is valid`, () => {
     app = await createApi();
     response = await request(app)
       .post(`/articles/${mockArticleId}/comments`)
+      .set(`Authorization`, token)
       .send(mockValidComment);
   });
 
@@ -118,6 +140,7 @@ describe(`API does not create a comment if the passed data is invalid`, () => {
   test(`Should return status code 400 without any required properties`, async () => {
     return request(app)
       .post(`/articles/${mockArticleId}/comments`)
+      .set(`Authorization`, token)
       .send(mockInvalidComment)
       .expect(HttpCode.BAD_REQUEST);
   });
@@ -127,6 +150,7 @@ describe(`API does not create a comment if the passed data is invalid`, () => {
     for (const badComment of badComments) {
       await request(app)
         .post(`/articles/${mockArticleId}/comments`)
+        .set(`Authorization`, token)
         .send(badComment)
         .expect(HttpCode.BAD_REQUEST);
     }
@@ -137,6 +161,7 @@ describe(`API does not create a comment if the passed data is invalid`, () => {
     for (const badComment of badComments) {
       await request(app)
         .post(`/articles/${mockArticleId}/comments`)
+        .set(`Authorization`, token)
         .send(badComment)
         .expect(HttpCode.BAD_REQUEST);
     }
@@ -148,6 +173,7 @@ test(`API returns status code 404 when trying to add a comment to a non-existent
 
   return request(app)
     .post(`/articles/12345/comments`)
+    .set(`Authorization`, token)
     .send(mockValidComment)
     .expect(HttpCode.NOT_FOUND);
 });
@@ -158,9 +184,9 @@ describe(`API correctly deletes a comment`, () => {
 
   beforeAll(async () => {
     app = await createApi();
-    response = await request(app).delete(
-      `/articles/${mockArticleId}/comments/${mockCommentId}`
-    );
+    response = await request(app)
+      .delete(`/articles/${mockArticleId}/comments/${mockCommentId}`)
+      .set(`Authorization`, token);
   });
 
   test(`Should return status code 200`, () =>
@@ -179,6 +205,7 @@ test(`API returns status code 404 when trying to delete non-existent comment`, a
 
   return request(app)
     .delete(`/articles/${mockArticleId}/comments/12345`)
+    .set(`Authorization`, token)
     .expect(HttpCode.NOT_FOUND);
 });
 
@@ -187,6 +214,7 @@ test(`API returns 404 status code when trying to remove a comment from a non-exi
 
   return request(app)
     .delete(`/articles/${mockArticleId}/comments/12345`)
+    .set(`Authorization`, token)
     .expect(HttpCode.NOT_FOUND);
 });
 
@@ -194,12 +222,20 @@ test(`API returns status code 400 if an invalid type was passed when trying to i
   const app = await createApi();
 
   await request(app)
-    .get(`/articles/${mockArticleId}/comments/id`)
-    .expect(HttpCode.BAD_REQUEST);
-  await request(app)
-    .put(`/articles/${mockArticleId}/comments/id`)
-    .expect(HttpCode.BAD_REQUEST);
-  await request(app)
     .delete(`/articles/${mockArticleId}/comments/id`)
+    .set(`Authorization`, token)
     .expect(HttpCode.BAD_REQUEST);
+});
+
+test(`API will return status code 401 if a user without a JWT token tries to interact with comments`, async () => {
+  const app = await createApi();
+
+  await request(app)
+    .post(`/articles/${mockArticleId}/comments`)
+    .send(mockValidComment)
+    .expect(HttpCode.UNAUTHORIZED);
+
+  await request(app)
+    .delete(`/articles/${mockArticleId}/comments/${mockCommentId}`)
+    .expect(HttpCode.UNAUTHORIZED);
 });

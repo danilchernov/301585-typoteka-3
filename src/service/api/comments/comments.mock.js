@@ -221,6 +221,11 @@ module.exports.mockUsers = [
   },
 ];
 
+module.exports.mockValidAuthData = {
+  email: `foo@gmail.com`,
+  password: `1234567890`,
+};
+
 module.exports.mockArticleId = `1`;
 
 module.exports.mockCommentId = `1`;
