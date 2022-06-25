@@ -3,6 +3,8 @@
 const { Router } = require(`express`);
 const { getApi } = require(`../api`);
 
+const jwtUtls = require(`../../lib/jwt`);
+
 const { upload } = require(`../middlewares/multer`);
 const csrfProtection = require(`../middlewares/csrf-protection`);
 
@@ -106,8 +108,11 @@ mainRoutes.post(
     };
 
     try {
-      const user = await api.loginUser(data);
-      req.session.loggedUser = user;
+      const accessToken = await api.loginUser(data);
+      const loggedUser = jwtUtls.verifyAccessToken(accessToken);
+
+      req.session.loggedUser = loggedUser;
+      req.session.accessToken = accessToken;
       return res.redirect(`/`);
     } catch (err) {
       req.session.email = data.email;

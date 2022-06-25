@@ -23,7 +23,7 @@ const app = new Router();
 
 defineModels(sequelize);
 
-module.exports = async (logger) => {
+module.exports = (logger) => {
   categories({ app, categoryService: new CategoryService(sequelize), logger });
 
   articles({

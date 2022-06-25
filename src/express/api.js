@@ -53,11 +53,22 @@ class API {
     });
   }
 
-  async createComment(id, userId, data) {
+  async createComment(id, accessToken, data) {
     return await this._load(`/articles/${id}/comments`, {
       method: HttpMethod.POST,
-      params: { userId },
+      headers: {
+        authorization: accessToken,
+      },
       data,
+    });
+  }
+
+  deleteComment(id, articleId, accessToken) {
+    return this._load(`/articles/${articleId}/comments/${id}`, {
+      method: `DELETE`,
+      headers: {
+        authorization: accessToken,
+      },
     });
   }
 
@@ -72,6 +83,12 @@ class API {
     return await this._load(`/user/login`, {
       method: HttpMethod.POST,
       data,
+    });
+  }
+
+  async getAllComments() {
+    return await this._load(`/comments`, {
+      method: HttpMethod.GET,
     });
   }
 }

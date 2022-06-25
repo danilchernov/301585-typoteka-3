@@ -79,6 +79,24 @@ beforeAll(async () => {
   token = loginResponse.body;
 });
 
+describe(`API returns comments from all articles`, () => {
+  let app;
+  let response;
+
+  beforeAll(async () => {
+    app = await createApi();
+    response = await request(app).get(`/comments`);
+  });
+
+  test(`Should return status code 200`, () => {
+    expect(response.statusCode).toBe(HttpCode.OK);
+  });
+
+  test(`Should return a list of 16 comments`, () => {
+    expect(response.body.length).toBe(16);
+  });
+});
+
 describe(`API returns a list of comments for the specified article`, () => {
   let app;
   let response;

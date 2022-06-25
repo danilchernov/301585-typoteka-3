@@ -17,8 +17,6 @@ const commentSchema = require(`../../schemas/comment`);
 module.exports = ({ app, articleService, commentService, logger } = {}) => {
   const route = new Router({ mergeParams: true });
 
-  app.use(`/`, route);
-
   const isRouteParameterValid = routeParameterValidator(
     routeParameterSchema,
     logger
@@ -28,12 +26,19 @@ module.exports = ({ app, articleService, commentService, logger } = {}) => {
 
   const isCommentValid = commentValidator(commentSchema, logger);
 
+  app.use(`/`, route);
+
+  route.get(`/comments`, async (req, res) => {
+    const comments = await commentService.findAll();
+    return res.status(HttpCode.OK).json(comments);
+  });
+
   route.get(
     `/articles/:articleId/comments`,
     [isRouteParameterValid, isArticleExists],
     async (req, res) => {
       const { article } = res.locals;
-      const comments = await commentService.findAll(article.id);
+      const comments = await commentService.findAllByArticle(article.id);
       return res.status(HttpCode.OK).json(comments);
     }
   );
@@ -74,6 +79,4 @@ module.exports = ({ app, articleService, commentService, logger } = {}) => {
       return res.status(HttpCode.OK).json(deletedComment);
     }
   );
-
-  return route;
 };
