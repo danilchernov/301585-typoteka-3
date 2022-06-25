@@ -3,7 +3,7 @@
 const { Router } = require(`express`);
 const { getApi } = require(`../api`);
 
-const { upload } = require(`../middlewares/multer`);
+const upload = require(`../middlewares/multer`);
 const isUserLogged = require(`../middlewares/is-user-logged`);
 const isUserAdmin = require(`../middlewares/is-user-admin`);
 

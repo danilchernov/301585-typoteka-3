@@ -5,7 +5,7 @@ const { getApi } = require(`../api`);
 
 const jwtUtls = require(`../../lib/jwt`);
 
-const { upload } = require(`../middlewares/multer`);
+const upload = require(`../middlewares/multer`);
 const csrfProtection = require(`../middlewares/csrf-protection`);
 
 const api = getApi();
