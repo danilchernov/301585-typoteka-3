@@ -39,21 +39,36 @@ class API {
     return await this._load(`/categories`, { params: { count } });
   }
 
-  async createArticle(data) {
+  async createArticle(data, accessToken) {
     return await this._load(`/articles`, {
       method: HttpMethod.POST,
+      headers: {
+        authorization: accessToken,
+      },
       data,
     });
   }
 
-  async updateArticle(id, data) {
+  async updateArticle(id, data, accessToken) {
     return await this._load(`/articles/${id}`, {
       method: HttpMethod.PUT,
+      headers: {
+        authorization: accessToken,
+      },
       data,
     });
   }
 
-  async createComment(id, accessToken, data) {
+  async deleteArticle(id, accessToken) {
+    return await this._load(`/articles/${id}`, {
+      method: `DELETE`,
+      headers: {
+        authorization: accessToken,
+      },
+    });
+  }
+
+  async createComment(id, data, accessToken) {
     return await this._load(`/articles/${id}/comments`, {
       method: HttpMethod.POST,
       headers: {
@@ -63,8 +78,8 @@ class API {
     });
   }
 
-  deleteComment(id, articleId, accessToken) {
-    return this._load(`/articles/${articleId}/comments/${id}`, {
+  async deleteComment(id, articleId, accessToken) {
+    return await this._load(`/articles/${articleId}/comments/${id}`, {
       method: `DELETE`,
       headers: {
         authorization: accessToken,

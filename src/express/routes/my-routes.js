@@ -20,6 +20,18 @@ myRoutes.get(`/`, async (req, res, next) => {
   }
 });
 
+myRoutes.get(`/articles/:articleId`, async (req, res, next) => {
+  const { accessToken } = req.session;
+  const { articleId } = req.params;
+
+  try {
+    await api.deleteArticle(articleId, accessToken);
+    res.redirect(`back`);
+  } catch (err) {
+    next(err);
+  }
+});
+
 myRoutes.get(`/comments`, async (req, res, next) => {
   try {
     const comments = await api.getAllComments();

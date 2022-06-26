@@ -40,6 +40,7 @@ articlesRoutes.post(
   [isUserAdmin, upload.single(`upload`)],
   async (req, res) => {
     const { body, file } = req;
+    const { accessToken } = req.session;
 
     const article = {
       title: body.title,
@@ -51,7 +52,7 @@ articlesRoutes.post(
     };
 
     try {
-      await api.createArticle(article);
+      await api.createArticle(article, accessToken);
       res.redirect(`/my`);
     } catch (err) {
       req.session.article = article;
@@ -97,8 +98,9 @@ articlesRoutes.post(
   `/edit/:id`,
   [isUserAdmin, upload.single(`upload`)],
   async (req, res) => {
-    const { id } = req.params;
     const { body, file } = req;
+    const { id } = req.params;
+    const { accessToken } = req.session;
 
     const article = {
       title: body.title,
@@ -110,7 +112,7 @@ articlesRoutes.post(
     };
 
     try {
-      await api.updateArticle(id, article);
+      await api.updateArticle(id, article, accessToken);
       return res.redirect(`/my`);
     } catch (err) {
       req.session.updatedArticle = article;
@@ -151,16 +153,16 @@ articlesRoutes.post(
   `/:id`,
   [isUserLogged, upload.single(`upload`)],
   async (req, res) => {
-    const { loggedUser } = req.session;
-    const { id } = req.params;
     const { body } = req;
+    const { id } = req.params;
+    const { accessToken } = req.session;
 
     const comment = {
       text: body.message,
     };
 
     try {
-      await api.createComment(id, loggedUser.id, comment);
+      await api.createComment(id, comment, accessToken);
       return res.redirect(`back`);
     } catch (err) {
       req.session.validationMessages = err.response.data.validationMessages;
