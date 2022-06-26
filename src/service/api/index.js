@@ -37,6 +37,7 @@ module.exports = (logger) => {
     app,
     articleService: new ArticleService(sequelize),
     commentService: new CommentService(sequelize),
+    logger,
   });
 
   search({ app, searchService: new SearchService(sequelize), logger });

@@ -45,7 +45,7 @@ module.exports = ({ app, articleService, commentService, logger } = {}) => {
 
   route.post(
     `/articles/:articleId/comments`,
-    [authenticateJwt, isUserAdmin, isArticleExists, isCommentValid],
+    [authenticateJwt, isArticleExists, isCommentValid],
     async (req, res) => {
       const { user, article } = res.locals;
 

@@ -136,7 +136,7 @@ describe(`API creates an comment if the passed data is valid`, () => {
     app = await createApi();
     response = await request(app)
       .post(`/articles/${mockArticleId}/comments`)
-      .set(`Authorization`, adminToken)
+      .set(`Authorization`, token)
       .send(mockValidComment);
   });
 
@@ -164,7 +164,7 @@ describe(`API does not create a comment if the passed data is invalid`, () => {
   test(`Should return status code 400 without any required properties`, async () => {
     return request(app)
       .post(`/articles/${mockArticleId}/comments`)
-      .set(`Authorization`, adminToken)
+      .set(`Authorization`, token)
       .send(mockInvalidComment)
       .expect(HttpCode.BAD_REQUEST);
   });
@@ -174,7 +174,7 @@ describe(`API does not create a comment if the passed data is invalid`, () => {
     for (const badComment of badComments) {
       await request(app)
         .post(`/articles/${mockArticleId}/comments`)
-        .set(`Authorization`, adminToken)
+        .set(`Authorization`, token)
         .send(badComment)
         .expect(HttpCode.BAD_REQUEST);
     }
@@ -185,7 +185,7 @@ describe(`API does not create a comment if the passed data is invalid`, () => {
     for (const badComment of badComments) {
       await request(app)
         .post(`/articles/${mockArticleId}/comments`)
-        .set(`Authorization`, adminToken)
+        .set(`Authorization`, token)
         .send(badComment)
         .expect(HttpCode.BAD_REQUEST);
     }
@@ -197,7 +197,7 @@ test(`API returns status code 404 when trying to add a comment to a non-existent
 
   return request(app)
     .post(`/articles/12345/comments`)
-    .set(`Authorization`, adminToken)
+    .set(`Authorization`, token)
     .send(mockValidComment)
     .expect(HttpCode.NOT_FOUND);
 });
@@ -266,12 +266,6 @@ test(`API returns status code 401 if a user without a JWT adminToken tries to in
 
 test(`API returns status code 403 if user does not have permission to interact with articles`, async () => {
   const app = await createApi();
-
-  await request(app)
-    .post(`/articles/${mockArticleId}/comments`)
-    .set(`Authorization`, token)
-    .send(mockValidComment)
-    .expect(HttpCode.FORBIDDEN);
 
   await request(app)
     .delete(`/articles/${mockArticleId}/comments/${mockCommentId}`)
