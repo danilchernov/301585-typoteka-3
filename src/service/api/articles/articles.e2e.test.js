@@ -9,28 +9,34 @@ const { getLogger } = require(`../../lib/logger`);
 
 const articles = require(`./articles`);
 const comments = require(`../comments/comments`);
-const DataService = require(`../../data-service/article`);
+const user = require(`../user/user`);
+
+const ArticleService = require(`../../data-service/article`);
 const CategoryService = require(`../../data-service/category`);
 const CommentService = require(`../../data-service/comment`);
+const UserService = require(`../../data-service/user`);
 
 const { HttpCode } = require(`../../../constants`);
 
 const {
   mockCategories,
   mockArticles,
-  mockComments,
-  mockUsers,
   mockArticleId,
   mockValidArticle,
   mockInvalidArticle,
+  mockUsers,
+  mockAdminAuthData,
+  mockAuthData,
 } = require(`./articles.mock`);
+
+process.env.JWT_SECRET = `jwt_secret`;
 
 const createApi = async () => {
   const mockDB = new Sequelize(`sqlite::memory:`, { logging: false });
+
   await initDB(mockDB, {
     categories: mockCategories,
     articles: mockArticles,
-    comments: mockComments,
     users: mockUsers,
   });
 
@@ -38,17 +44,38 @@ const createApi = async () => {
   const logger = getLogger();
   app.use(express.json());
 
-  const articlesCommentsRouter = comments(new CommentService(mockDB));
-  articles(
+  articles({
     app,
-    new DataService(mockDB),
-    new CategoryService(mockDB),
-    articlesCommentsRouter,
-    logger
-  );
+    articleService: new ArticleService(mockDB),
+    categoryService: new CategoryService(mockDB),
+    logger,
+  });
+
+  comments({
+    app,
+    articleService: new ArticleService(mockDB),
+    commentService: new CommentService(mockDB),
+  });
+
+  user({ app, userService: new UserService(mockDB), logger });
 
   return app;
 };
+
+let adminToken;
+let token;
+
+beforeAll(async () => {
+  const app = await createApi();
+
+  const [adminLoginReponse, loginResponse] = await Promise.all([
+    request(app).post(`/user/login`).send(mockAdminAuthData),
+    request(app).post(`/user/login`).send(mockAuthData),
+  ]);
+
+  adminToken = adminLoginReponse.body;
+  token = loginResponse.body;
+});
 
 describe(`API returns a list of all articles`, () => {
   let app;
@@ -93,7 +120,10 @@ describe(`API creates an article if the passed data is valid`, () => {
 
   beforeAll(async () => {
     app = await createApi();
-    response = await request(app).post(`/articles`).send(mockValidArticle);
+    response = await request(app)
+      .post(`/articles`)
+      .set(`Authorization`, adminToken)
+      .send(mockValidArticle);
   });
 
   test(`Should return status code 201`, () => {
@@ -125,6 +155,7 @@ describe(`API does not create an article if the passed data is invalid`, () => {
 
       await request(app)
         .post(`/articles`)
+        .set(`Authorization`, adminToken)
         .send(badArticle)
         .expect(HttpCode.BAD_REQUEST);
     }
@@ -139,6 +170,7 @@ describe(`API does not create an article if the passed data is invalid`, () => {
     for (const badArticle of badArticles) {
       await request(app)
         .post(`/articles`)
+        .set(`Authorization`, adminToken)
         .send(badArticle)
         .expect(HttpCode.BAD_REQUEST);
     }
@@ -153,6 +185,7 @@ describe(`API does not create an article if the passed data is invalid`, () => {
     for (const badArticle of badArticles) {
       await request(app)
         .post(`/articles`)
+        .set(`Authorization`, adminToken)
         .send(badArticle)
         .expect(HttpCode.BAD_REQUEST);
     }
@@ -167,6 +200,7 @@ describe(`API changes an existing article`, () => {
     app = await createApi();
     response = await request(app)
       .put(`/articles/${mockArticleId}`)
+      .set(`Authorization`, adminToken)
       .send(mockValidArticle);
   });
 
@@ -192,6 +226,7 @@ test(`API returns status code 404 when trying to change non-existent article`, a
 
   return request(app)
     .put(`/articles/12345`)
+    .set(`Authorization`, adminToken)
     .send(mockValidArticle)
     .expect(HttpCode.NOT_FOUND);
 });
@@ -201,6 +236,7 @@ test(`API returns status code 400 when trying to change an article with invalid 
 
   return request(app)
     .put(`/articles/${mockArticleId}`)
+    .set(`Authorization`, adminToken)
     .send(mockInvalidArticle)
     .expect(HttpCode.BAD_REQUEST);
 });
@@ -211,7 +247,9 @@ describe(`API correctly deletes an article`, () => {
 
   beforeAll(async () => {
     app = await createApi();
-    response = await request(app).delete(`/articles/${mockArticleId}`);
+    response = await request(app)
+      .delete(`/articles/${mockArticleId}`)
+      .set(`Authorization`, adminToken);
   });
 
   test(`Should return status code 200`, () => {
@@ -231,13 +269,61 @@ describe(`API correctly deletes an article`, () => {
 
 test(`API returns status code 404 when trying to delete non-existent article`, async () => {
   const app = await createApi();
-  return request(app).delete(`/articles/12345`).expect(HttpCode.NOT_FOUND);
+  return request(app)
+    .delete(`/articles/12345`)
+    .set(`Authorization`, adminToken)
+    .expect(HttpCode.NOT_FOUND);
 });
 
 test(`API returns status code 400 if an invalid type was passed when trying to interact with an article`, async () => {
   const app = await createApi();
 
   await request(app).get(`/articles/id`).expect(HttpCode.BAD_REQUEST);
-  await request(app).put(`/articles/id`).expect(HttpCode.BAD_REQUEST);
-  await request(app).delete(`/articles/id`).expect(HttpCode.BAD_REQUEST);
+
+  await request(app)
+    .put(`/articles/id`)
+    .set(`Authorization`, adminToken)
+    .expect(HttpCode.BAD_REQUEST);
+
+  await request(app)
+    .delete(`/articles/id`)
+    .set(`Authorization`, adminToken)
+    .expect(HttpCode.BAD_REQUEST);
+});
+
+test(`API will return status code 401 if a user without a JWT adminToken tries to interact with articles`, async () => {
+  const app = await createApi();
+
+  await request(app)
+    .post(`/articles`)
+    .send(mockValidArticle)
+    .expect(HttpCode.UNAUTHORIZED);
+
+  await request(app)
+    .put(`/articles/${mockArticleId}`)
+    .expect(HttpCode.UNAUTHORIZED);
+
+  await request(app)
+    .delete(`/articles/${mockArticleId}`)
+    .expect(HttpCode.UNAUTHORIZED);
+});
+
+test(`API returns status code 403 if user does not have permission to interact with articles`, async () => {
+  const app = await createApi();
+
+  await request(app)
+    .post(`/articles`)
+    .send(mockValidArticle)
+    .set(`Authorization`, token)
+    .expect(HttpCode.FORBIDDEN);
+
+  await request(app)
+    .put(`/articles/${mockArticleId}`)
+    .set(`Authorization`, token)
+    .expect(HttpCode.FORBIDDEN);
+
+  await request(app)
+    .delete(`/articles/${mockArticleId}`)
+    .set(`Authorization`, token)
+    .expect(HttpCode.FORBIDDEN);
 });

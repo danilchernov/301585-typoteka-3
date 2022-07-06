@@ -5,30 +5,27 @@ const request = require(`supertest`);
 const Sequelize = require(`sequelize`);
 
 const initDB = require(`../../lib/init-db`);
+const { getLogger } = require(`../../lib/logger`);
+
 const search = require(`./search`);
-const DataService = require(`../../data-service/search`);
+const SearchService = require(`../../data-service/search`);
 
 const { HttpCode } = require(`../../../constants`);
 
-const {
-  mockCategories,
-  mockArticles,
-  mockComments,
-  mockUsers,
-} = require(`./search.mock`);
+const { mockCategories, mockArticles } = require(`./search.mock`);
 const mockDB = new Sequelize(`sqlite::memory:`, { logging: false });
 
 const app = express();
 app.use(express.json());
+const logger = getLogger();
 
 beforeAll(async () => {
   await initDB(mockDB, {
     categories: mockCategories,
     articles: mockArticles,
-    comments: mockComments,
-    users: mockUsers,
   });
-  search(app, new DataService(mockDB));
+
+  search({ app, searchService: new SearchService(mockDB), logger });
 });
 
 describe(`API returns a list of articles based on search query`, () => {

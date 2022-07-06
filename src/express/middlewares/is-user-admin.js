@@ -1,9 +1,9 @@
 "use strict";
 
 module.exports = (req, res, next) => {
-  const { loggedUser } = req.session;
+  const { loggedUser = {} } = req.session;
 
-  if (!loggedUser || !loggedUser.admin) {
+  if (!loggedUser.admin) {
     return res.redirect(`/`);
   }
 

@@ -7,15 +7,26 @@ const { nanoid } = require(`nanoid`);
 const MAX_NAME_LENGTH = 10;
 
 const UPLOAD_DIR = `../upload/img/`;
+const FILE_TYPES = [`image/png`, `image/jpg`, `image/jpeg`];
 const uploadDirAbsolute = path.resolve(__dirname, UPLOAD_DIR);
 
 const storage = multer.diskStorage({
   destination: uploadDirAbsolute,
-  filename: (_req, file, cb) => {
+  filename: (req, file, cb) => {
     const uniqueName = nanoid(MAX_NAME_LENGTH);
     const extension = file.originalname.split(`.`).pop();
     cb(null, `${uniqueName}.${extension}`);
   },
 });
 
-module.exports.upload = multer({ storage });
+const fileFilter = (req, file, cb) => {
+  if (FILE_TYPES.includes(file.mimetype)) {
+    cb(null, true);
+  } else {
+    cb(null, false);
+  }
+};
+
+const upload = multer({ storage, fileFilter });
+
+module.exports = upload;

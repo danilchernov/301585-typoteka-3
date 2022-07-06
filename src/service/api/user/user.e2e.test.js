@@ -4,14 +4,18 @@ const express = require(`express`);
 const request = require(`supertest`);
 const Sequelize = require(`sequelize`);
 
+const jwtUtils = require(`../../../lib/jwt`);
+
 const initDB = require(`../../lib/init-db`);
 const { getLogger } = require(`../../lib/logger`);
 
 const user = require(`./user`);
-const DataService = require(`../../data-service/user`);
+const UserService = require(`../../data-service/user`);
 
 const { HttpCode } = require(`../../../constants`);
 const { mockValidUser, mockValidAuthData } = require(`./user.mock`);
+
+process.env.JWT_SECRET = `jwt_secret`;
 
 const createApi = async () => {
   const mockDB = new Sequelize(`sqlite::memory:`, { logging: false });
@@ -26,7 +30,7 @@ const createApi = async () => {
   const logger = getLogger();
   app.use(express.json());
 
-  user(app, new DataService(mockDB), logger);
+  user({ app, userService: new UserService(mockDB), logger });
 
   return app;
 };
@@ -135,8 +139,11 @@ describe(`API authenticate user if data is valid`, () => {
     return expect(response.statusCode).toBe(HttpCode.OK);
   });
 
-  test(`Should return an article with expected firstName`, () =>
-    expect(response.body.firstName).toBe(mockValidUser.firstName));
+  test(`Should return an user with expected firstName`, () => {
+    const loggedUser = jwtUtils.verifyAccessToken(response.body);
+
+    expect(loggedUser.firstName).toBe(mockValidUser.firstName);
+  });
 });
 
 describe(`API refuses to authenticate user if data is invalid`, () => {

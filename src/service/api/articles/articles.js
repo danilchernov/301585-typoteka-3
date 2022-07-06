@@ -3,6 +3,9 @@
 const { Router } = require(`express`);
 const { HttpCode } = require(`../../../constants`);
 
+const authenticateJwt = require(`../../middlewares/authenticate-jwt`);
+const isUserAdmin = require(`../../middlewares/is-user-admin`);
+
 const routeParameterValidator = require(`../../middlewares/route-parameter-validator`);
 const routeParameterSchema = require(`../../schemas/route-parameter`);
 
@@ -10,13 +13,7 @@ const articleExists = require(`../../middlewares/article-exists`);
 const articleValidator = require(`../../middlewares/article-validator`);
 const articleSchema = require(`../../schemas/article`);
 
-module.exports = (
-  api,
-  articleService,
-  CategoryService,
-  commentsRouter,
-  logger
-) => {
+module.exports = ({ app, articleService, categoryService, logger } = {}) => {
   const route = new Router();
 
   const isRouteParameterValid = routeParameterValidator(
@@ -24,21 +21,19 @@ module.exports = (
     logger
   );
   const isArticleExists = articleExists(articleService, logger);
+
   const isArticleValid = articleValidator(
     articleSchema,
-    CategoryService,
+    categoryService,
     logger
   );
 
-  api.use(`/articles`, route);
-  route.use(`/:articleId`, isRouteParameterValid);
-  route.use(`/:articleId/comments`, isArticleExists, commentsRouter);
+  app.use(`/articles`, route);
 
   route.get(`/`, async (req, res) => {
     const { comments = false, limit = null, offset = null } = req.query;
-    let result;
 
-    result =
+    const result =
       limit || offset
         ? await articleService.findPage({ limit, offset, comments })
         : await articleService.findAll({ comments });
@@ -46,21 +41,35 @@ module.exports = (
     return res.status(HttpCode.OK).json(result);
   });
 
-  route.post(`/`, isArticleValid, async (req, res) => {
-    const article = await articleService.create(req.body);
+  route.post(
+    `/`,
+    [authenticateJwt, isUserAdmin, isArticleValid],
+    async (req, res) => {
+      const article = await articleService.create(req.body);
 
-    return res.status(HttpCode.CREATED).json(article);
-  });
+      return res.status(HttpCode.CREATED).json(article);
+    }
+  );
 
-  route.get(`/:articleId`, isArticleExists, async (req, res) => {
-    const { article } = res.locals;
+  route.get(
+    `/:articleId`,
+    [isRouteParameterValid, isArticleExists],
+    async (req, res) => {
+      const { article } = res.locals;
 
-    return res.status(HttpCode.OK).json(article);
-  });
+      return res.status(HttpCode.OK).json(article);
+    }
+  );
 
   route.put(
     `/:articleId`,
-    [isArticleExists, isArticleValid],
+    [
+      authenticateJwt,
+      isUserAdmin,
+      isRouteParameterValid,
+      isArticleExists,
+      isArticleValid,
+    ],
     async (req, res) => {
       const { article } = res.locals;
       const updatedArticle = await articleService.update(article.id, req.body);
@@ -69,10 +78,14 @@ module.exports = (
     }
   );
 
-  route.delete(`/:articleId`, isArticleExists, async (req, res) => {
-    const { article } = res.locals;
-    const deletedArticle = await articleService.delete(article.id);
+  route.delete(
+    `/:articleId`,
+    [authenticateJwt, isUserAdmin, isRouteParameterValid, isArticleExists],
+    async (req, res) => {
+      const { article } = res.locals;
+      const deletedArticle = await articleService.delete(article.id);
 
-    return res.status(HttpCode.OK).json(deletedArticle);
-  });
+      return res.status(HttpCode.OK).json(deletedArticle);
+    }
+  );
 };

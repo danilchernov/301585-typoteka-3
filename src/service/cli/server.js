@@ -50,7 +50,7 @@ module.exports = {
       const [customPort] = args;
       const port = Number.parseInt(customPort, 10) || DEFAULT_PORT;
 
-      app.use(API_PREFIX, await initializeApiRoutes(logger));
+      app.use(API_PREFIX, initializeApiRoutes(logger));
 
       app.use((req, res) => {
         res.status(HttpCode.NOT_FOUND).send(`Not found`);

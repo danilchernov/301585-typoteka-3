@@ -5,7 +5,7 @@ const Alias = require(`../models/alias`);
 
 module.exports = async (
   sequelize,
-  { articles, categories, comments, users }
+  { articles = [], categories = [], comments = [], users = [] }
 ) => {
   const { Category, Article, Comment, User } = defineModels(sequelize);
   await sequelize.sync({ force: true });
@@ -35,9 +35,5 @@ module.exports = async (
 
   await Promise.all(articlePromises);
 
-  try {
-    await Comment.bulkCreate(comments);
-  } catch (err) {
-    console.log(`🚀 ~ file: init-db.js ~ line 41 ~ err`, err);
-  }
+  await Comment.bulkCreate(comments);
 };

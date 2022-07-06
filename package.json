@@ -5,16 +5,18 @@
   "main": "./src/service/service.js",
   "scripts": {
     "test": "npm run eslint && npm run jest",
-    "jest": "cross-env NODE_ENV=test jest",
     "eslint": "eslint --ext .js src/",
     "eslint:fix": "npm run eslint -- --fix",
     "prettier": "prettier  src/ --check",
     "prettier:fix": "npm run prettier -- --write",
     "format": "npm run prettier:fix && npm run eslint:fix",
-    "start-back-server": "cross-env NODE_ENV=production node -r dotenv/config ./src/service/service.js --server",
-    "start-back-server:debug": "cross-env NODE_ENV=development nodemon -r dotenv/config ./src/service/service.js --server",
-    "start-front-server": "nodemon -r dotenv/config ./src/express/express",
-    "start:parallel": "concurrently \"npm run start-back-server:debug\" \"npm run start-front-server\""
+    "jest": "jest",
+    "backend:prod": "cross-env NODE_ENV=production node -r dotenv/config ./src/service/service.js --server",
+    "backend:dev": "cross-env NODE_ENV=development nodemon -r dotenv/config ./src/service/service.js --server",
+    "ssr:dev": "nodemon -r dotenv/config ./src/express/express",
+    "ssr:prod": "node -r dotenv/config ./src/express/express",
+    "start:dev": "concurrently --names \"SSR, BACKEND\" \"npm run ssr:dev\" \"npm run backend:dev\"",
+    "start:prod": "concurrently --names \"SSR, BACKEND\" \"npm run ssr:prod\" \"npm run backend:prod\""
   },
   "repository": {
     "type": "git",
@@ -51,6 +53,7 @@
     "express": "4.17.3",
     "express-session": "1.17.3",
     "joi": "17.6.0",
+    "jsonwebtoken": "8.5.1",
     "multer": "1.4.4",
     "nanoid": "3.3.1",
     "nodemon": "2.0.15",

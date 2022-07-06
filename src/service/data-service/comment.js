@@ -1,5 +1,7 @@
 "use strict";
 
+const Alias = require(`../models/alias`);
+
 class CommentService {
   constructor(sequelize) {
     this._Article = sequelize.models.Article;
@@ -28,11 +30,20 @@ class CommentService {
     return await this._Comment.findByPk(id);
   }
 
-  async findAll(articleId) {
+  async findAllByArticle(articleId) {
     return await this._Comment.findAll({
       where: { articleId },
       raw: true,
     });
+  }
+
+  async findAll() {
+    const comments = await this._Comment.findAll({
+      include: [Alias.USERS, Alias.ARTICLES],
+      order: [[`createdAt`, `DESC`]],
+    });
+
+    return comments.map((comment) => comment.get());
   }
 }
 

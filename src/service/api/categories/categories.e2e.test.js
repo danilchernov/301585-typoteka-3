@@ -5,31 +5,28 @@ const request = require(`supertest`);
 const Sequelize = require(`sequelize`);
 
 const initDB = require(`../../lib/init-db`);
+const { getLogger } = require(`../../lib/logger`);
+
 const categories = require(`./categories`);
-const DataService = require(`../../data-service/category`);
+const CategoryService = require(`../../data-service/category`);
 
 const { HttpCode } = require(`../../../constants`);
 
-const {
-  mockCategories,
-  mockArticles,
-  mockComments,
-  mockUsers,
-} = require(`./categories.mock`);
+const { mockCategories, mockArticles } = require(`./categories.mock`);
 const mockDB = new Sequelize(`sqlite::memory:`, { logging: false });
 
 const app = express();
+const logger = getLogger();
 app.use(express.json());
 
 beforeAll(async () => {
   await initDB(mockDB, {
     categories: mockCategories,
     articles: mockArticles,
-    comments: mockComments,
-    users: mockUsers,
+    logger,
   });
 
-  categories(app, new DataService(mockDB));
+  categories({ app, categoryService: new CategoryService(mockDB) });
 });
 
 describe(`API returns a list of categories`, () => {
