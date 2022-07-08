@@ -16,7 +16,8 @@
     "ssr:dev": "nodemon -r dotenv/config ./src/express/express",
     "ssr:prod": "node -r dotenv/config ./src/express/express",
     "start:dev": "concurrently --names \"SSR, BACKEND\" \"npm run ssr:dev\" \"npm run backend:dev\"",
-    "start:prod": "concurrently --names \"SSR, BACKEND\" \"npm run ssr:prod\" \"npm run backend:prod\""
+    "start:prod": "concurrently --names \"SSR, BACKEND\" \"npm run ssr:prod\" \"npm run backend:prod\"",
+    "fill-db": "node -r dotenv/config ./src/service/service --filldb"
   },
   "repository": {
     "type": "git",

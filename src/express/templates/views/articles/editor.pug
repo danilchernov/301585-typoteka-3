@@ -48,7 +48,7 @@ block content
 
                 .form__field.form__field--publication-text
                   label
-                    textarea(rows='10' name='full-text' placeholder='Полный текст публикации' required) #{article ? article.fullText : ''}
+                    textarea(rows='10' name='full-text' placeholder='Полный текст публикации') #{article ? article.fullText : ''}
               if validationMessages
                 .form__validation-error
                   p.form__error-message При вводе данных произошли ошибки:

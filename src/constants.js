@@ -83,7 +83,7 @@ module.exports.RouteParameterMessage = {
 module.exports.User = {
   FIRST_NAME_REGEX: /^[A-zА-я]+$/,
   LAST_NAME_REGEX: /^[A-zА-я]+$/,
-  PASSWORD_MIN_LENGTH: 10,
+  PASSWORD_MIN_LENGTH: 6,
 };
 
 module.exports.UserMessage = {

@@ -21,7 +21,6 @@ const define = (sequelize) => {
       },
       fullText: {
         type: DataTypes.STRING(1000),
-        allowNull: false,
       },
       image: {
         type: DataTypes.STRING,
@@ -43,15 +42,14 @@ const defineRelations = (models) => {
   Article.hasMany(models.Comment, {
     as: Alias.COMMENTS,
     foreignKey: `articleId`,
-    onDelete: `cascade`,
+    onDelete: `CASCADE`,
   });
 
   Article.belongsToMany(models.Category, {
     through: models.ArticleCategory,
     as: Alias.CATEGORIES,
+    onDelete: `CASCADE`,
   });
-
-  Article.belongsTo(models.User, { as: Alias.USERS, foreignKey: `userId` });
 };
 
 module.exports = { define, defineRelations };

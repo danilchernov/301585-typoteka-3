@@ -20,12 +20,19 @@ class ArticleService {
     return !!deletedRows;
   }
 
+  async update(id, articleData) {
+    const [affectedRows] = await this._Article.update(articleData, {
+      where: { id },
+    });
+
+    return !!affectedRows;
+  }
+
   async findOne(id, { comments } = {}) {
     const include = [
       Alias.CATEGORIES,
       ...(comments
         ? [
-            Alias.COMMENTS,
             {
               model: this._Comment,
               as: Alias.COMMENTS,
@@ -35,7 +42,13 @@ class ArticleService {
         : []),
     ];
 
-    return this._Article.findByPk(id, { include });
+    const order = [
+      ...(comments
+        ? [[{ model: this._Comment, as: Alias.COMMENTS }, `createdAt`, `DESC`]]
+        : []),
+    ];
+
+    return this._Article.findByPk(id, { include, order });
   }
 
   async findAll({ comments } = {}) {
@@ -43,7 +56,7 @@ class ArticleService {
 
     const articles = await this._Article.findAll({
       include,
-      order: [[`createdAt`, `DESC`]],
+      order: [[`date`, `DESC`]],
     });
 
     return articles.map((item) => item.get());
@@ -56,19 +69,11 @@ class ArticleService {
       limit,
       offset,
       include,
-      order: [[`createdAt`, `DESC`]],
+      order: [[`date`, `DESC`]],
       distinct: true,
     });
 
     return { count, articles: rows };
-  }
-
-  async update(id, articleData) {
-    const [affectedRows] = await this._Article.update(articleData, {
-      where: { id },
-    });
-
-    return !!affectedRows;
   }
 }
 

@@ -34,6 +34,7 @@ class CommentService {
     return await this._Comment.findAll({
       where: { articleId },
       raw: true,
+      order: [[`createdAt`, `DESC`]],
     });
   }
 

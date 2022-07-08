@@ -5,14 +5,12 @@ block content
     h1.visually-hidden Главная страница личного блога Типотека
     p
       | Это приветственный текст, который владелец блога может выбрать, чтобы описать себя 👏
-    section.main-page__theme-list
-      h2.visually-hidden Список тем
-      ul.themes
-        each category in categories
-          li.themes__item
-            a.themes__item-link(href='#')
-              | #{category.name}
-              sup #{category.count}
+
+    if categories && categories.length
+      section.main-page__theme-list
+        h2.visually-hidden Список тем
+        include /partials/themes
+
     .main-page__section-flex
       section.main-page__hot.hot
         h2.hot__name
@@ -40,6 +38,7 @@ block content
               | Tesla получила 146 тысяч предзаказов на электрический пикап Cybertruck
               | за двое суток
               sup.hot__link-sup 153
+
       section.main-page__last.last
         h2.last__name
           | Последние комментарии
@@ -65,6 +64,7 @@ block content
             a.last__list-link(href='#')
               | Что-то все электрокары в последнее время все на одно лицо
               | делаются))
+
     section.main-page__list.preview
       h2.visually-hidden Список превью статей
       ul.preview__list
@@ -75,10 +75,13 @@ block content
                 each category in article.categories
                   li.preview__breadcrumbs-item
                     a.preview__breadcrumbs-link(href='#') #{category.name}
-            if article.image
-              .preview__background
+
+            .preview__background
+              if article.image
                 img.preview__background-image(src=`img/${article.image}` width='460' height='240' alt=`Изображение - ${article.title}`)
+
             +date(article.createdAt)(class="preview__time")
+
             h3.preview__name
               a.preview__name-link(href=`/articles/${article.id}`) #{article.title}
             p.preview__text #{article.announce}

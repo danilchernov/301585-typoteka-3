@@ -1,6 +1,6 @@
 header.header
   a.header__logo.logo(href="/")
-    img.logo__image(src="/img/icons/logo-image-only.svg", alt="логотип Тайпотеки")
+    img.logo__image(src="/img/icons/logo-image-only.svg", alt="Логотип Типотеки")
     span.logo__name Типотека
 
   if loggedUser && isAdmin
@@ -11,7 +11,7 @@ header.header
         li.navigation__item
           a(href="/my") Публикации
         li.navigation__item
-          a(href="/categories") Категории
+          a(href="my/categories") Категории
         li.navigation__item
           a(href="/my/comments") Комментарии
         li.navigation__item
@@ -24,8 +24,8 @@ header.header
           p #{loggedUser.firstName} #{loggedUser.lastName}
         li.header__list-item
           a.header__exit(href="/logout") Выйти
-    if loggedUser.avatar
-      a.header__avatar.avatar
+    a.header__avatar.avatar
+      if loggedUser.avatar
         img(src=`/img/${loggedUser.avatar}`, alt='аватар пользователя')
 
   else

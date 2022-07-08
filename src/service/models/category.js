@@ -28,9 +28,13 @@ const defineRelations = (models) => {
   Category.belongsToMany(models.Article, {
     through: models.ArticleCategory,
     as: Alias.ARTICLES,
+    onDelete: `CASCADE`,
   });
 
-  Category.hasMany(models.ArticleCategory, { as: Alias.ARTICLES_CATEGORIES });
+  Category.hasMany(models.ArticleCategory, {
+    as: Alias.ARTICLES_CATEGORIES,
+    onDelete: `CASCADE`,
+  });
 };
 
 module.exports = { define, defineRelations };
