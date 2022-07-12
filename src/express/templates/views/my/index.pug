@@ -11,7 +11,7 @@ block content
         each article in articles
           li.notes__list-item
             time.notes__item-time(datetime=`${article.createdAt}`) #{article.createdDate}
-            a.notes__item-text(href=`articles/${article.id}`) #{article.title}
+            a.notes__item-text(href=`articles/edit/${article.id}`) #{article.title}
             a.notes__button.button.button--close-item(href=`/my/articles/${article.id}`)
               span.visually-hidden Закрыть строку списка
 
