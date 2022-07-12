@@ -42,17 +42,18 @@ module.exports.Article = {
 
 module.exports.ArticleMessage = {
   TITLE_MIN_LENGTH: `Заголовок содержит меньше ${module.exports.Article.TITLE_MIN_LENGTH} символов`,
-  TITLE_MAX_LENGTH: `Заголовок не может содержать более ${module.exports.Article.TITLE_MAX_LENGTH} символов`,
+  TITLE_MAX_LENGTH: `Заголовок не может содержать больше ${module.exports.Article.TITLE_MAX_LENGTH} символов`,
   TITLE_REQUIRED: `Заголовок публикации не может быть пустым`,
   ANNOUNCE_MIN_LENGTH: `Анонс содержит меньше ${module.exports.Article.ANNOUNCE_MIN_LENGTH} символов`,
-  ANNOUNCE_MAX_LENGTH: `Анонс не может содержать более ${module.exports.Article.ANNOUNCE_MAX_LENGTH} символов`,
+  ANNOUNCE_MAX_LENGTH: `Анонс не может содержать больше ${module.exports.Article.ANNOUNCE_MAX_LENGTH} символов`,
   ANNOUNCE_REQUIRED: `Анонс публикации не может быть пустым`,
-  FULL_TEXT_MAX_LENGTH: `Полный текст публикации не может содержать более ${module.exports.Article.FULL_TEXT_MAX_LENGTH} символов`,
+  FULL_TEXT_MAX_LENGTH: `Полный текст публикации не может содержать больше ${module.exports.Article.FULL_TEXT_MAX_LENGTH} символов`,
   CATEGORIES_BASE: `Значение не относится к типу массива или не может быть приведено к массиву из строки`,
   CATEGORIES_MIN_LENGTH: `У публикации должна быть выбрана хотя бы ${module.exports.Article.CATEGORIES_MIN_LENGTH} категория`,
   CATEGORIES_ONLY: `Указана несуществующая категория`,
   DATE_ISO_DATE: `Строка не является допустимой строкой даты ISO`,
   DATE_REQUIRED: `Укажите дату`,
+  NOT_EXISTS: `Статья с таким идентификатором не найдена`,
 };
 
 module.exports.Category = {
