@@ -14,6 +14,7 @@ const define = (sequelize) => {
       name: {
         type: DataTypes.STRING(30),
         allowNull: false,
+        unique: true,
       },
     },
     {
@@ -28,12 +29,10 @@ const defineRelations = (models) => {
   Category.belongsToMany(models.Article, {
     through: models.ArticleCategory,
     as: Alias.ARTICLES,
-    onDelete: `CASCADE`,
   });
 
   Category.hasMany(models.ArticleCategory, {
     as: Alias.ARTICLES_CATEGORIES,
-    onDelete: `CASCADE`,
   });
 };
 

@@ -55,6 +55,20 @@ module.exports.ArticleMessage = {
   DATE_REQUIRED: `Укажите дату`,
 };
 
+module.exports.Category = {
+  NAME_MIN_LENGTH: 5,
+  NAME_MAX_LENGTH: 30,
+};
+
+module.exports.CategoryMessage = {
+  NAME_MIN_LENGTH: `Название катеогрии содержит меньше ${module.exports.Category.NAME_MIN_LENGTH} символов`,
+  NAME_MAX_LENGTH: `Название категории не может содержать больше ${module.exports.Category.NAME_MAX_LENGTH} символов`,
+  REQUIRED: `Название категории не может быть пустым`,
+  NOT_EXISTS: `Категория с таким идентификатором не найдена`,
+  HAS_ARTICLES: `Категория, у которой есть статья, не может быть удалена`,
+  NAME_UNIQUE: `Категория с таким именем уже существует`,
+};
+
 module.exports.Comment = {
   TEXT_MIN_LENGTH: 20,
   TEXT_MAX_LENGTH: 100,
@@ -72,6 +86,9 @@ module.exports.RouteParameter = {
 };
 
 module.exports.RouteParameterMessage = {
+  CATEGORY_ID_BASE: `Идентификатор ресурса должен быть натуральным числом`,
+  CATEGORY_ID_MIN: `Идентификатор ресурса должен быть больше нуля`,
+  CATEGORY_ID_INTEGER: `Идентификатор ресурса должен быть целым числом`,
   ARTICLE_ID_BASE: `Идентификатор ресурса должен быть натуральным числом`,
   ARTICLE_ID_MIN: `Идентификатор ресурса должен быть больше нуля`,
   ARTICLE_ID_INTEGER: `Идентификатор ресурса должен быть целым числом`,
