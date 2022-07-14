@@ -12,7 +12,7 @@ module.exports = (categoryService, logger) => async (req, res, next) => {
 
     return res
       .status(HttpCode.BAD_REQUEST)
-      .json({ validationMessages: CategoryMessage.HAS_ARTICLES });
+      .json({ validationMessages: [CategoryMessage.HAS_ARTICLES] });
   }
 
   return next();
