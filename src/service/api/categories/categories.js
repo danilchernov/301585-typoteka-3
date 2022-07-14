@@ -64,16 +64,16 @@ module.exports = ({ app, categoryService, logger } = {}) => {
     [
       authenticateJwt,
       isUserAdmin,
+      isRouteParameterValid,
       isCategoryExists,
       isCategoryValid,
       isCategoryHasUniqueName,
     ],
     async (req, res) => {
       const { categoryId } = req.params;
+      const updated = await categoryService.update(categoryId, req.body);
 
-      await categoryService.update(categoryId, req.body);
-
-      return res.status(HttpCode.OK).send(`Category was updated`);
+      return res.status(HttpCode.OK).send(updated);
     }
   );
 
@@ -88,9 +88,9 @@ module.exports = ({ app, categoryService, logger } = {}) => {
     ],
     async (req, res) => {
       const { categoryId } = req.params;
-      const deletedCategory = await categoryService.delete(categoryId);
+      const deleted = await categoryService.delete(categoryId);
 
-      return res.status(HttpCode.OK).json(deletedCategory);
+      return res.status(HttpCode.OK).json(deleted);
     }
   );
 };
