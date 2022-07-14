@@ -61,6 +61,7 @@ const UserLimit = {
 };
 
 const MONTH_PERIOD = 3;
+
 const DEFAULT_PASSWORD = `$2a$10$47Jc9oY.7eu.NnjaJ5wBbu.TvUbYkQSEpZcvB0v.sDDobGTR1/P6m`; // 1234567890
 
 const readContent = async (filePath) => {
@@ -79,7 +80,7 @@ const generateTitle = (titles) => {
   return shuffle(titles)[getRandomInt(0, titles.length - 1)];
 };
 
-const generateAnnounce = (count = 1, sentences) => {
+const generateAnnounce = (count, sentences) => {
   return shuffle(sentences).slice(0, count).join(` `);
 };
 
@@ -98,11 +99,21 @@ const generateDate = () => {
   return formatDate(getRandomDate(new Date(nMonthsAgo), today));
 };
 
-const generateCategories = (count = 1, categories) => {
-  return shuffle(categories).slice(0, count);
+const generateCategories = (categoryNames) => {
+  return categoryNames.map((name) => ({ name }));
 };
 
-const generateUsers = (count = 1, firstNames, lastNames, emails) => {
+const generateArticleCategories = (count, categoryNames) => {
+  const categories = generateCategories(categoryNames).map(
+    (category, index) => ({ id: index + 1, ...category })
+  );
+
+  return shuffle(categories)
+    .slice(0, count)
+    .map(({ id }) => id);
+};
+
+const generateUsers = (count, firstNames, lastNames, emails) => {
   return Array(count)
     .fill({})
     .map((_, index) => ({
@@ -115,12 +126,7 @@ const generateUsers = (count = 1, firstNames, lastNames, emails) => {
     }));
 };
 
-const generateArticleComments = (
-  count = 1,
-  articleId,
-  comments,
-  usersCount
-) => {
+const generateArticleComments = (count, articleId, comments, usersCount) => {
   return Array(count)
     .fill({})
     .map(() => ({
@@ -132,7 +138,7 @@ const generateArticleComments = (
     }));
 };
 
-const generateComments = (count = 1, comments, usersCount) => {
+const generateComments = (count, comments, usersCount) => {
   return Array(count)
     .fill()
     .reduce((acc, _, index) => {
@@ -147,7 +153,7 @@ const generateComments = (count = 1, comments, usersCount) => {
     }, []);
 };
 
-const generateArticles = (count = 1, titles, categories, images, sentences) => {
+const generateArticles = (count, titles, categoryNames, images, sentences) => {
   return Array(count)
     .fill({})
     .map(() => {
@@ -162,9 +168,9 @@ const generateArticles = (count = 1, titles, categories, images, sentences) => {
           getRandomInt(FullTextLimit.MIN, FullTextLimit.MAX),
           sentences
         ),
-        categories: generateCategories(
+        categories: generateArticleCategories(
           getRandomInt(CategoryLimit.MIN, CategoryLimit.MAX),
-          categories
+          categoryNames
         ),
         date: generateDate(),
       };
@@ -194,7 +200,7 @@ module.exports = {
     }
 
     const titles = await readContent(FILE_TITLES_PATH);
-    const categories = await readContent(FILE_CATEGORIES_PATH);
+    const categoryNames = await readContent(FILE_CATEGORIES_PATH);
     const images = await readContent(FILE_IMAGES_PATH);
     const sentences = await readContent(FILE_SENTENCES_PATH);
     const commentsSentences = await readContent(FILE_COMMENTS_PATH);
@@ -202,12 +208,14 @@ module.exports = {
     const lastNames = await readContent(FILE_SURNAMES_PATH);
     const emails = await readContent(FILE_EMAILS_PATH);
 
+    const categories = generateCategories(categoryNames);
+
     const users = generateUsers(UserLimit.MIN, firstNames, lastNames, emails);
 
     const articles = generateArticles(
       countArticles,
       titles,
-      categories,
+      categoryNames,
       images,
       sentences
     );

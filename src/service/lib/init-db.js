@@ -10,17 +10,7 @@ module.exports = async (
   const { Category, Article, Comment, User } = defineModels(sequelize);
   await sequelize.sync({ force: true });
 
-  const categoryModels = await Category.bulkCreate(
-    categories.map((item) => ({ name: item }))
-  );
-
-  const categoryIdByName = categoryModels.reduce(
-    (acc, next) => ({
-      [next.name]: next.id,
-      ...acc,
-    }),
-    {}
-  );
+  await Category.bulkCreate(categories);
 
   await User.bulkCreate(users);
 
@@ -28,9 +18,8 @@ module.exports = async (
     const ArticleModel = await Article.create(article, {
       include: [Alias.COMMENTS],
     });
-    await ArticleModel.addCategories(
-      article.categories.map((name) => categoryIdByName[name])
-    );
+
+    await ArticleModel.addCategories(article.categories);
   });
 
   await Promise.all(articlePromises);
