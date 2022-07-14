@@ -125,6 +125,7 @@ articlesRoutes.post(
 
 articlesRoutes.get(`/:id`, async (req, res, next) => {
   const { id } = req.params;
+  const { referer } = req.headers;
   const { validationMessages = null } = req.session;
 
   try {
@@ -143,6 +144,7 @@ articlesRoutes.get(`/:id`, async (req, res, next) => {
       article,
       categories,
       validationMessages,
+      referer,
     });
   } catch (err) {
     return next();
