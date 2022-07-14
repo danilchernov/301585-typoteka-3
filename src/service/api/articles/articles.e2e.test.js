@@ -275,7 +275,7 @@ test(`API returns status code 404 when trying to delete non-existent article`, a
     .expect(HttpCode.NOT_FOUND);
 });
 
-test(`API returns status code 400 if an invalid type was passed when trying to interact with an article`, async () => {
+test(`API returns a 400 status code if a parameter of the wrong type was passed in an attempt to interact with a resource`, async () => {
   const app = await createApi();
 
   await request(app).get(`/articles/id`).expect(HttpCode.BAD_REQUEST);
@@ -313,7 +313,6 @@ test(`API returns status code 403 if user does not have permission to interact w
 
   await request(app)
     .post(`/articles`)
-    .send(mockValidArticle)
     .set(`Authorization`, token)
     .expect(HttpCode.FORBIDDEN);
 
