@@ -61,6 +61,25 @@ module.exports = ({ app, articleService, categoryService, logger } = {}) => {
     }
   );
 
+  route.get(
+    `/category/:categoryId`,
+    isRouteParameterValid,
+    async (req, res) => {
+      const { categoryId } = req.params;
+      const { offset, limit } = req.query;
+
+      const result =
+        limit || offset
+          ? await articleService.findPageByCategory(categoryId, {
+              limit,
+              offset,
+            })
+          : await articleService.findAllByCategory(categoryId);
+
+      return res.status(HttpCode.OK).json(result);
+    }
+  );
+
   route.put(
     `/:articleId`,
     [

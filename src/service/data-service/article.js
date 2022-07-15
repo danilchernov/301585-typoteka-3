@@ -7,6 +7,7 @@ class ArticleService {
     this._Article = sequelize.models.Article;
     this._Comment = sequelize.models.Comment;
     this._Category = sequelize.models.Category;
+    this._ArticleCategory = sequelize.models.ArticleCategory;
   }
 
   async create(articleData) {
@@ -62,7 +63,28 @@ class ArticleService {
       order: [[`date`, `DESC`]],
     });
 
-    return articles.map((item) => item.get());
+    return articles.map((article) => article.get());
+  }
+
+  async findAllByCategory(categoryId) {
+    const include = [
+      Alias.CATEGORIES,
+      Alias.COMMENTS,
+      {
+        model: this._ArticleCategory,
+        as: Alias.ARTICLES_CATEGORIES,
+        attributes: [],
+        required: true,
+        where: { CategoryId: categoryId },
+      },
+    ];
+
+    const articles = await this._Article.findAll({
+      include,
+      order: [[`date`, `DESC`]],
+    });
+
+    return articles.map((article) => article.get());
   }
 
   async findPage({ comments, limit, offset } = {}) {
@@ -77,6 +99,30 @@ class ArticleService {
     });
 
     return { count, articles: rows };
+  }
+
+  async findPageByCategory(categoryId, { offset, limit } = {}) {
+    const include = [
+      Alias.CATEGORIES,
+      Alias.COMMENTS,
+      {
+        model: this._ArticleCategory,
+        as: Alias.ARTICLES_CATEGORIES,
+        attributes: [],
+        required: true,
+        where: { CategoryId: categoryId },
+      },
+    ];
+
+    const { count, rows } = await this._Article.findAndCountAll({
+      include,
+      distinct: true,
+      offset,
+      limit,
+      order: [[`date`, `DESC`]],
+    });
+
+    return { count, articles: rows.map((item) => item.get()) };
   }
 }
 

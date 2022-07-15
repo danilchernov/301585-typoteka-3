@@ -3,6 +3,7 @@
 const { Router } = require(`express`);
 const { getApi } = require(`../api`);
 
+const { ARTICLES_PER_PAGE } = require(`../../constants`);
 const jwtUtls = require(`../../lib/jwt`);
 
 const upload = require(`../middlewares/multer`);
@@ -11,8 +12,6 @@ const csrfProtection = require(`../middlewares/csrf-protection`);
 const api = getApi();
 
 const mainRoutes = new Router();
-
-const ARTICLES_PER_PAGE = 8;
 
 mainRoutes.get(`/`, async (req, res, next) => {
   let { page = 1 } = req.query;

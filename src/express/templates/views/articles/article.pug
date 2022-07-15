@@ -11,22 +11,7 @@ block content
             a.post__backwards.button.button--backwards(href=`${referer || '/'}`) Назад
             +date(article.createdAt)(class="post__date")
             h2.post__title.title.title--main #{article.title}
-            ul.post__themes.themes
-              li.themes__item
-                a.themes__item-link(href='#')
-                  | Автомобили
-                  sup 88
-                button.themes__remove-btn(type='button') Удалить категорию
-              li.themes__item
-                a.themes__item-link(href='#')
-                  | Удаленная работа
-                  sup 13
-                button.themes__remove-btn(type='button') Удалить категорию
-              li.themes__item
-                a.themes__item-link(href='#')
-                  | Бизнес
-                  sup 13
-                button.themes__remove-btn(type='button') Удалить категорию
+            +themes(categories)(class=`post__themes`)
           if article.image
             .post__picture
               img(src=`img/${article.image}` alt=`Изображение - ${article.title}`)

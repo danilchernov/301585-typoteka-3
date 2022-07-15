@@ -1,0 +1,9 @@
+mixin themes(categories = [], currentCategory = {})
+  ul.themes(class!=attributes.class || ``)
+    each category in categories
+      if category.count != 0
+        li.themes__item
+          a(class=`themes__item-link ${currentCategory ? (currentCategory.id === category.id ? `themes__item-link--active` : ``)  : ``}` href=`/articles/category/${category.id}`)
+            | #{category.name}
+            sup #{category.count}
+

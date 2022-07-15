@@ -31,6 +31,8 @@ module.exports.HttpMethod = {
 
 module.exports.API_PREFIX = `/api`;
 
+module.exports.ARTICLES_PER_PAGE = 8;
+
 module.exports.Article = {
   TITLE_MIN_LENGTH: 30,
   TITLE_MAX_LENGTH: 250,
@@ -82,6 +84,7 @@ module.exports.CommentMessage = {
 };
 
 module.exports.RouteParameter = {
+  CATEGORY_ID_MIN: 1,
   ARTICLE_ID_MIN: 1,
   COMMENT_ID_MIN: 1,
 };

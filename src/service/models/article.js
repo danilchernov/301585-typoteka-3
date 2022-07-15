@@ -50,6 +50,8 @@ const defineRelations = (models) => {
     as: Alias.CATEGORIES,
     onDelete: `CASCADE`,
   });
+
+  Article.hasMany(models.ArticleCategory, { as: Alias.ARTICLES_CATEGORIES });
 };
 
 module.exports = { define, defineRelations };

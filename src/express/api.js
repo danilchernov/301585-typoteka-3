@@ -31,6 +31,12 @@ class API {
     return await this._load(`/articles/${id}`, { params: { comments } });
   }
 
+  async getArticlesByCategory(id, { offset, limit } = {}) {
+    return this._load(`/articles/category/${id}`, {
+      params: { offset, limit },
+    });
+  }
+
   async createArticle(data, accessToken) {
     return await this._load(`/articles`, {
       method: HttpMethod.POST,
@@ -105,6 +111,10 @@ class API {
 
   async getCategories({ count } = {}) {
     return await this._load(`/categories`, { params: { count } });
+  }
+
+  async getCategory(id) {
+    return await this._load(`/categories/${id}`);
   }
 
   async createCategory(data, accessToken) {

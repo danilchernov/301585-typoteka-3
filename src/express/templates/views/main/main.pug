@@ -9,7 +9,7 @@ block content
     if categories && categories.length
       section.main-page__theme-list
         h2.visually-hidden Список тем
-        include /partials/themes
+        +themes(categories)
 
     .main-page__section-flex
       section.main-page__hot.hot
@@ -67,30 +67,9 @@ block content
 
     section.main-page__list.preview
       h2.visually-hidden Список превью статей
-      ul.preview__list
-        each article in articles
-          li.preview__item
-            if article.categories.length
-              ul.preview__breadcrumbs
-                each category in article.categories
-                  li.preview__breadcrumbs-item
-                    a.preview__breadcrumbs-link(href='#') #{category.name}
-
-            .preview__background
-              if article.image
-                img.preview__background-image(src=`img/${article.image}` width='460' height='240' alt=`Изображение - ${article.title}`)
-
-            +date(article.createdAt)(class="preview__time")
-
-            h3.preview__name
-              a.preview__name-link(href=`/articles/${article.id}`) #{article.title}
-            p.preview__text #{article.announce}
-            a.preview__comment(href='#')
-              | Комментарии
-              span.preview__cloud
-              b.preview__comment-count #{article.comments.length || 0}
+      +preview-list(articles)
 
     if totalPages > 1
       .preview__toggle-wrapper
-        +pagination(page, totalPages, 2, `?`)
+        +pagination({page, totalPages})
 

@@ -3,6 +3,8 @@
 const { Router } = require(`express`);
 const { getApi } = require(`../api`);
 
+const { ARTICLES_PER_PAGE } = require(`../../constants`);
+
 const upload = require(`../middlewares/multer`);
 const isUserLogged = require(`../middlewares/is-user-logged`);
 const isUserAdmin = require(`../middlewares/is-user-admin`);
@@ -13,8 +15,38 @@ const api = getApi();
 
 const articlesRoutes = new Router();
 
-articlesRoutes.get(`/category/:id`, (req, res) => {
-  return res.render(`views/articles/articles-by-category`);
+articlesRoutes.get(`/category/:id`, async (req, res, next) => {
+  const { id } = req.params;
+
+  let { page = 1 } = req.query;
+  page = +page;
+
+  const limit = ARTICLES_PER_PAGE;
+  const offset = (page - 1) * ARTICLES_PER_PAGE;
+
+  try {
+    const [{ count, articles }, currentCategory, categories] =
+      await Promise.all([
+        api.getArticlesByCategory(id, { offset, limit }),
+        api.getCategory(id),
+        api.getCategories({ count: true }),
+      ]);
+
+    const totalPages = Math.ceil(count / ARTICLES_PER_PAGE);
+
+    const data = {
+      articles,
+      categories,
+      currentCategory,
+      page,
+      totalPages,
+      count,
+    };
+
+    return res.render(`views/articles/articles-by-category`, data);
+  } catch (err) {
+    return next(err);
+  }
 });
 
 articlesRoutes.get(`/add`, isUserAdmin, async (req, res, next) => {
