@@ -7,6 +7,7 @@ class ArticleService {
     this._Article = sequelize.models.Article;
     this._Comment = sequelize.models.Comment;
     this._Category = sequelize.models.Category;
+    this._ArticleCategory = sequelize.models.ArticleCategory;
   }
 
   async create(articleData) {
@@ -20,12 +21,22 @@ class ArticleService {
     return !!deletedRows;
   }
 
+  async update(id, articleData) {
+    const [affectedRows] = await this._Article.update(articleData, {
+      where: { id },
+    });
+
+    const updatedArticle = await this._Article.findByPk(id);
+    await updatedArticle.setCategories(articleData.categories);
+
+    return !!affectedRows;
+  }
+
   async findOne(id, { comments } = {}) {
     const include = [
       Alias.CATEGORIES,
       ...(comments
         ? [
-            Alias.COMMENTS,
             {
               model: this._Comment,
               as: Alias.COMMENTS,
@@ -35,7 +46,13 @@ class ArticleService {
         : []),
     ];
 
-    return this._Article.findByPk(id, { include });
+    const order = [
+      ...(comments
+        ? [[{ model: this._Comment, as: Alias.COMMENTS }, `createdAt`, `DESC`]]
+        : []),
+    ];
+
+    return this._Article.findByPk(id, { include, order });
   }
 
   async findAll({ comments } = {}) {
@@ -43,10 +60,31 @@ class ArticleService {
 
     const articles = await this._Article.findAll({
       include,
-      order: [[`createdAt`, `DESC`]],
+      order: [[`date`, `DESC`]],
     });
 
-    return articles.map((item) => item.get());
+    return articles.map((article) => article.get());
+  }
+
+  async findAllByCategory(categoryId) {
+    const include = [
+      Alias.CATEGORIES,
+      Alias.COMMENTS,
+      {
+        model: this._ArticleCategory,
+        as: Alias.ARTICLES_CATEGORIES,
+        attributes: [],
+        required: true,
+        where: { CategoryId: categoryId },
+      },
+    ];
+
+    const articles = await this._Article.findAll({
+      include,
+      order: [[`date`, `DESC`]],
+    });
+
+    return articles.map((article) => article.get());
   }
 
   async findPage({ comments, limit, offset } = {}) {
@@ -56,19 +94,35 @@ class ArticleService {
       limit,
       offset,
       include,
-      order: [[`createdAt`, `DESC`]],
+      order: [[`date`, `DESC`]],
       distinct: true,
     });
 
     return { count, articles: rows };
   }
 
-  async update(id, articleData) {
-    const [affectedRows] = await this._Article.update(articleData, {
-      where: { id },
+  async findPageByCategory(categoryId, { offset, limit } = {}) {
+    const include = [
+      Alias.CATEGORIES,
+      Alias.COMMENTS,
+      {
+        model: this._ArticleCategory,
+        as: Alias.ARTICLES_CATEGORIES,
+        attributes: [],
+        required: true,
+        where: { CategoryId: categoryId },
+      },
+    ];
+
+    const { count, rows } = await this._Article.findAndCountAll({
+      include,
+      distinct: true,
+      offset,
+      limit,
+      order: [[`date`, `DESC`]],
     });
 
-    return !!affectedRows;
+    return { count, articles: rows.map((item) => item.get()) };
   }
 }
 

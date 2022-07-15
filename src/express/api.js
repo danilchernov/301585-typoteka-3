@@ -31,12 +31,10 @@ class API {
     return await this._load(`/articles/${id}`, { params: { comments } });
   }
 
-  async search(query) {
-    return await this._load(`/search`, { params: { query } });
-  }
-
-  async getCategories({ count } = {}) {
-    return await this._load(`/categories`, { params: { count } });
+  async getArticlesByCategory(id, { offset, limit } = {}) {
+    return this._load(`/articles/category/${id}`, {
+      params: { offset, limit },
+    });
   }
 
   async createArticle(data, accessToken) {
@@ -87,6 +85,12 @@ class API {
     });
   }
 
+  async getAllComments() {
+    return await this._load(`/comments`, {
+      method: HttpMethod.GET,
+    });
+  }
+
   async createUser(data) {
     return await this._load(`/user`, {
       method: HttpMethod.POST,
@@ -101,9 +105,44 @@ class API {
     });
   }
 
-  async getAllComments() {
-    return await this._load(`/comments`, {
-      method: HttpMethod.GET,
+  async search(query) {
+    return await this._load(`/search`, { params: { query } });
+  }
+
+  async getCategories({ count } = {}) {
+    return await this._load(`/categories`, { params: { count } });
+  }
+
+  async getCategory(id) {
+    return await this._load(`/categories/${id}`);
+  }
+
+  async createCategory(data, accessToken) {
+    return await this._load(`/categories`, {
+      method: HttpMethod.POST,
+      data,
+      headers: {
+        authorization: accessToken,
+      },
+    });
+  }
+
+  async updateCategory(id, data, accessToken) {
+    return await this._load(`/categories/${id}`, {
+      method: HttpMethod.PUT,
+      data,
+      headers: {
+        authorization: accessToken,
+      },
+    });
+  }
+
+  async deleteCategory(id, accessToken) {
+    return await this._load(`/categories/${id}`, {
+      method: `DELETE`,
+      headers: {
+        authorization: accessToken,
+      },
     });
   }
 }

@@ -61,6 +61,25 @@ module.exports = ({ app, articleService, categoryService, logger } = {}) => {
     }
   );
 
+  route.get(
+    `/category/:categoryId`,
+    isRouteParameterValid,
+    async (req, res) => {
+      const { categoryId } = req.params;
+      const { offset, limit } = req.query;
+
+      const result =
+        limit || offset
+          ? await articleService.findPageByCategory(categoryId, {
+              limit,
+              offset,
+            })
+          : await articleService.findAllByCategory(categoryId);
+
+      return res.status(HttpCode.OK).json(result);
+    }
+  );
+
   route.put(
     `/:articleId`,
     [
@@ -72,9 +91,9 @@ module.exports = ({ app, articleService, categoryService, logger } = {}) => {
     ],
     async (req, res) => {
       const { article } = res.locals;
-      const updatedArticle = await articleService.update(article.id, req.body);
+      const updated = await articleService.update(article.id, req.body);
 
-      return res.status(HttpCode.OK).json(updatedArticle);
+      return res.status(HttpCode.OK).json(updated);
     }
   );
 
@@ -83,9 +102,9 @@ module.exports = ({ app, articleService, categoryService, logger } = {}) => {
     [authenticateJwt, isUserAdmin, isRouteParameterValid, isArticleExists],
     async (req, res) => {
       const { article } = res.locals;
-      const deletedArticle = await articleService.delete(article.id);
+      const deleted = await articleService.delete(article.id);
 
-      return res.status(HttpCode.OK).json(deletedArticle);
+      return res.status(HttpCode.OK).json(deleted);
     }
   );
 };

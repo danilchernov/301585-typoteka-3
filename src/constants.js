@@ -31,6 +31,8 @@ module.exports.HttpMethod = {
 
 module.exports.API_PREFIX = `/api`;
 
+module.exports.ARTICLES_PER_PAGE = 8;
+
 module.exports.Article = {
   TITLE_MIN_LENGTH: 30,
   TITLE_MAX_LENGTH: 250,
@@ -42,17 +44,32 @@ module.exports.Article = {
 
 module.exports.ArticleMessage = {
   TITLE_MIN_LENGTH: `Заголовок содержит меньше ${module.exports.Article.TITLE_MIN_LENGTH} символов`,
-  TITLE_MAX_LENGTH: `Заголовок не может содержать более ${module.exports.Article.TITLE_MAX_LENGTH} символов`,
+  TITLE_MAX_LENGTH: `Заголовок не может содержать больше ${module.exports.Article.TITLE_MAX_LENGTH} символов`,
   TITLE_REQUIRED: `Заголовок публикации не может быть пустым`,
   ANNOUNCE_MIN_LENGTH: `Анонс содержит меньше ${module.exports.Article.ANNOUNCE_MIN_LENGTH} символов`,
-  ANNOUNCE_MAX_LENGTH: `Анонс не может содержать более ${module.exports.Article.ANNOUNCE_MAX_LENGTH} символов`,
+  ANNOUNCE_MAX_LENGTH: `Анонс не может содержать больше ${module.exports.Article.ANNOUNCE_MAX_LENGTH} символов`,
   ANNOUNCE_REQUIRED: `Анонс публикации не может быть пустым`,
-  FULL_TEXT_MAX_LENGTH: `Полный текст публикации не может содержать более ${module.exports.Article.FULL_TEXT_MAX_LENGTH} символов`,
+  FULL_TEXT_MAX_LENGTH: `Полный текст публикации не может содержать больше ${module.exports.Article.FULL_TEXT_MAX_LENGTH} символов`,
   CATEGORIES_BASE: `Значение не относится к типу массива или не может быть приведено к массиву из строки`,
   CATEGORIES_MIN_LENGTH: `У публикации должна быть выбрана хотя бы ${module.exports.Article.CATEGORIES_MIN_LENGTH} категория`,
   CATEGORIES_ONLY: `Указана несуществующая категория`,
   DATE_ISO_DATE: `Строка не является допустимой строкой даты ISO`,
   DATE_REQUIRED: `Укажите дату`,
+  NOT_EXISTS: `Статья с таким идентификатором не найдена`,
+};
+
+module.exports.Category = {
+  NAME_MIN_LENGTH: 5,
+  NAME_MAX_LENGTH: 30,
+};
+
+module.exports.CategoryMessage = {
+  NAME_MIN_LENGTH: `Название катеогрии содержит меньше ${module.exports.Category.NAME_MIN_LENGTH} символов`,
+  NAME_MAX_LENGTH: `Название категории не может содержать больше ${module.exports.Category.NAME_MAX_LENGTH} символов`,
+  REQUIRED: `Название категории не может быть пустым`,
+  NOT_EXISTS: `Категория с таким идентификатором не найдена`,
+  HAS_ARTICLES: `Категория, у которой есть статья, не может быть удалена`,
+  NAME_UNIQUE: `Категория с таким именем уже существует`,
 };
 
 module.exports.Comment = {
@@ -67,11 +84,15 @@ module.exports.CommentMessage = {
 };
 
 module.exports.RouteParameter = {
+  CATEGORY_ID_MIN: 1,
   ARTICLE_ID_MIN: 1,
   COMMENT_ID_MIN: 1,
 };
 
 module.exports.RouteParameterMessage = {
+  CATEGORY_ID_BASE: `Идентификатор ресурса должен быть натуральным числом`,
+  CATEGORY_ID_MIN: `Идентификатор ресурса должен быть больше нуля`,
+  CATEGORY_ID_INTEGER: `Идентификатор ресурса должен быть целым числом`,
   ARTICLE_ID_BASE: `Идентификатор ресурса должен быть натуральным числом`,
   ARTICLE_ID_MIN: `Идентификатор ресурса должен быть больше нуля`,
   ARTICLE_ID_INTEGER: `Идентификатор ресурса должен быть целым числом`,
@@ -83,7 +104,7 @@ module.exports.RouteParameterMessage = {
 module.exports.User = {
   FIRST_NAME_REGEX: /^[A-zА-я]+$/,
   LAST_NAME_REGEX: /^[A-zА-я]+$/,
-  PASSWORD_MIN_LENGTH: 10,
+  PASSWORD_MIN_LENGTH: 6,
 };
 
 module.exports.UserMessage = {

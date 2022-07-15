@@ -26,9 +26,14 @@ const defineRelations = (models) => {
   Comment.belongsTo(models.Article, {
     as: Alias.ARTICLES,
     foreignKey: `articleId`,
+    onDelete: `CASCADE`,
   });
 
-  Comment.belongsTo(models.User, { as: Alias.USERS, foreignKey: `userId` });
+  Comment.belongsTo(models.User, {
+    as: Alias.USERS,
+    foreignKey: `userId`,
+    onDelete: `CASCADE`,
+  });
 };
 
 module.exports = { define, defineRelations };

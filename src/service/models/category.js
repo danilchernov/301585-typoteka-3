@@ -14,6 +14,7 @@ const define = (sequelize) => {
       name: {
         type: DataTypes.STRING(30),
         allowNull: false,
+        unique: true,
       },
     },
     {
@@ -30,7 +31,9 @@ const defineRelations = (models) => {
     as: Alias.ARTICLES,
   });
 
-  Category.hasMany(models.ArticleCategory, { as: Alias.ARTICLES_CATEGORIES });
+  Category.hasMany(models.ArticleCategory, {
+    as: Alias.ARTICLES_CATEGORIES,
+  });
 };
 
 module.exports = { define, defineRelations };

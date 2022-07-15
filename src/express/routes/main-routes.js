@@ -3,6 +3,7 @@
 const { Router } = require(`express`);
 const { getApi } = require(`../api`);
 
+const { ARTICLES_PER_PAGE } = require(`../../constants`);
 const jwtUtls = require(`../../lib/jwt`);
 
 const upload = require(`../middlewares/multer`);
@@ -11,8 +12,6 @@ const csrfProtection = require(`../middlewares/csrf-protection`);
 const api = getApi();
 
 const mainRoutes = new Router();
-
-const ARTICLES_PER_PAGE = 8;
 
 mainRoutes.get(`/`, async (req, res, next) => {
   let { page = 1 } = req.query;
@@ -29,12 +28,16 @@ mainRoutes.get(`/`, async (req, res, next) => {
 
     const totalPages = Math.ceil(count / ARTICLES_PER_PAGE);
 
-    return res.render(`views/main/index`, {
+    const data = {
       articles,
       page,
       totalPages,
       categories,
-    });
+    };
+
+    return articles.length
+      ? res.render(`views/main/main`, data)
+      : res.render(`views/main/main-empty`);
   } catch (err) {
     return next(err);
   }
@@ -47,11 +50,13 @@ mainRoutes.get(`/register`, csrfProtection, (req, res) => {
   req.session.user = null;
   req.session.validationMessages = null;
 
-  return res.render(`views/main/register`, {
+  const data = {
     user,
     validationMessages,
     csrfToken,
-  });
+  };
+
+  return res.render(`views/main/register`, data);
 });
 
 mainRoutes.post(
@@ -71,6 +76,7 @@ mainRoutes.post(
 
     try {
       await api.createUser(user);
+
       return res.redirect(`/login`);
     } catch (err) {
       req.session.user = user;
@@ -82,18 +88,19 @@ mainRoutes.post(
 );
 
 mainRoutes.get(`/login`, csrfProtection, (req, res) => {
-  const { email, password, validationMessages } = req.session;
+  const { email, validationMessages } = req.session;
   const csrfToken = req.csrfToken();
 
   req.session.email = null;
-  req.session.password = null;
+  req.session.validationMessages = null;
 
-  return res.render(`views/main/login`, {
+  const data = {
     email,
-    password,
     validationMessages,
     csrfToken,
-  });
+  };
+
+  return res.render(`views/main/login`, data);
 });
 
 mainRoutes.post(
@@ -113,10 +120,10 @@ mainRoutes.post(
 
       req.session.loggedUser = loggedUser;
       req.session.accessToken = accessToken;
+
       return res.redirect(`/`);
     } catch (err) {
       req.session.email = data.email;
-      req.session.password = data.password;
       req.session.validationMessages = err.response.data.validationMessages;
 
       return res.redirect(`/login`);
@@ -125,13 +132,17 @@ mainRoutes.post(
 );
 
 mainRoutes.get(`/search`, async (req, res) => {
-  try {
-    const { query } = req.query;
-    const results = await api.search(query);
-    res.render(`views/main/search`, { searchText: query, results });
-  } catch (err) {
-    res.render(`views/main/search`, { searchText: ``, results: [] });
+  if (!req.query.query) {
+    return res.render(`views/main/search`);
   }
+
+  const { query } = req.query;
+  const results = await api.search(query);
+  const data = { searchText: query, results };
+
+  return results.length
+    ? res.render(`views/main/search`, data)
+    : res.render(`views/main/search-empty`, data);
 });
 
 mainRoutes.get(`/logout`, (req, res) => {

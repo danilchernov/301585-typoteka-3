@@ -1,0 +1,8 @@
+
+
+mixin preview-list(articles = [])
+  if articles.length
+    ul.preview__list
+      each article in articles
+        +preview-item(article)
+

@@ -2,19 +2,14 @@ extend /layout
 
 append variables
   - bodyClasses = ['wrapper-color']
-  - hasResults = results && results.length
 
 block content
   section.search-page
-    .search-page__wrapper
+    .search-page__wrapper.search-page__wrapper--empty
       h1 Поиск
       .search.search-page__form
         form(action='/search' method='get')
           label
             input(type='text' name='query' placeholder='Что ищем?' value=`${searchText || ''}`)
           button.search__button.button.button--transparent(type='submit') Найти
-      if hasResults
-        each result in results
-          .search__result
-            +date(result.createdAt)(class="search__date")
-            a.search__link(href=`/articles/${result.id}`) #{result.title}
+        p.search-page__empty Ничего не нашлось

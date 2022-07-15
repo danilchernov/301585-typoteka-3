@@ -242,7 +242,7 @@ test(`API returns 404 status code when trying to remove a comment from a non-exi
     .expect(HttpCode.NOT_FOUND);
 });
 
-test(`API returns status code 400 if an invalid type was passed when trying to interact with a comment`, async () => {
+test(`API returns a 400 status code if a parameter of the wrong type was passed in an attempt to interact with a resource`, async () => {
   const app = await createApi();
 
   await request(app)

@@ -8,29 +8,19 @@ block content
         h2.visually-hidden Основное содержание
         .post__wrapper
           .post__head
-            a.post__backwards.button.button--backwards(href='#') Назад
+            a.post__backwards.button.button--backwards(href=`${referer || '/'}`) Назад
             +date(article.createdAt)(class="post__date")
             h2.post__title.title.title--main #{article.title}
-            ul.post__themes.themes
-              li.themes__item
-                a.themes__item-link(href='#')
-                  | Автомобили
-                  sup 88
-                button.themes__remove-btn(type='button') Удалить категорию
-              li.themes__item
-                a.themes__item-link(href='#')
-                  | Удаленная работа
-                  sup 13
-                button.themes__remove-btn(type='button') Удалить категорию
-              li.themes__item
-                a.themes__item-link(href='#')
-                  | Бизнес
-                  sup 13
-                button.themes__remove-btn(type='button') Удалить категорию
+            +themes(categories)(class=`post__themes`)
           if article.image
             .post__picture
               img(src=`img/${article.image}` alt=`Изображение - ${article.title}`)
-          .post__text #{article.fullText}
+
+          .post__text
+            h3 #{article.announce}
+
+            if article.fullText
+              p #{article.fullText}
       .post__wrapper.post__wrapper--comments
         section.post__comments.comments
           h2.comments__title.title.title--middle #{article.comments.length > 0 ? `Комментарии` : `Комментарии отсутствуют`}
@@ -40,7 +30,8 @@ block content
               each comment in article.comments
                 li.comments__comment
                   .comments__avatar.avatar
-                    img(src=`/img/${comment.users.avatar}` alt="Аватар пользователя")
+                    if comment.users.avatar
+                      img(src=`/img/${comment.users.avatar}` alt="Аватар пользователя")
                   .comments__text
                     .comments__head
                       p #{comment.users.firstName} #{comment.users.lastName} •
@@ -59,4 +50,11 @@ block content
               if validationMessages
                 each error in validationMessages
                   p.comments__error #{error}
+          else
+            .comments__footer.comments__footer--visitor
+              a.comments__button.button.button--colored(href='/login') Войти
+              .comments__registration
+                p.text.text--signature
+                  b.title.title--small Регистрация
+                  | Чтобы присоединиться к переписке нужно зарегистрироваться
 

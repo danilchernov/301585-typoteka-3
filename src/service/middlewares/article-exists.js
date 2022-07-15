@@ -1,6 +1,6 @@
 "use strict";
 
-const { HttpCode } = require(`../../constants`);
+const { HttpCode, ArticleMessage } = require(`../../constants`);
 
 module.exports = (service, logger) => async (req, res, next) => {
   const { articleId } = req.params;
@@ -12,9 +12,9 @@ module.exports = (service, logger) => async (req, res, next) => {
       `[${req.method}] Article with id "${articleId}" not found ${req.originalUrl}`
     );
 
-    return res
-      .status(HttpCode.NOT_FOUND)
-      .send(`Article with id "${articleId}" not found`);
+    return res.status(HttpCode.NOT_FOUND).send({
+      validationMessages: [ArticleMessage.NOT_EXISTS],
+    });
   }
 
   res.locals.article = article;

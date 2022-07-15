@@ -3,6 +3,8 @@
 const { Router } = require(`express`);
 const { getApi } = require(`../api`);
 
+const { ARTICLES_PER_PAGE } = require(`../../constants`);
+
 const upload = require(`../middlewares/multer`);
 const isUserLogged = require(`../middlewares/is-user-logged`);
 const isUserAdmin = require(`../middlewares/is-user-admin`);
@@ -13,8 +15,38 @@ const api = getApi();
 
 const articlesRoutes = new Router();
 
-articlesRoutes.get(`/category/:id`, (req, res) => {
-  return res.render(`views/articles/articles-by-category`);
+articlesRoutes.get(`/category/:id`, async (req, res, next) => {
+  const { id } = req.params;
+
+  let { page = 1 } = req.query;
+  page = +page;
+
+  const limit = ARTICLES_PER_PAGE;
+  const offset = (page - 1) * ARTICLES_PER_PAGE;
+
+  try {
+    const [{ count, articles }, currentCategory, categories] =
+      await Promise.all([
+        api.getArticlesByCategory(id, { offset, limit }),
+        api.getCategory(id),
+        api.getCategories({ count: true }),
+      ]);
+
+    const totalPages = Math.ceil(count / ARTICLES_PER_PAGE);
+
+    const data = {
+      articles,
+      categories,
+      currentCategory,
+      page,
+      totalPages,
+      count,
+    };
+
+    return res.render(`views/articles/articles-by-category`, data);
+  } catch (err) {
+    return next(err);
+  }
 });
 
 articlesRoutes.get(`/add`, isUserAdmin, async (req, res, next) => {
@@ -22,6 +54,7 @@ articlesRoutes.get(`/add`, isUserAdmin, async (req, res, next) => {
 
   try {
     const categories = await api.getCategories();
+
     req.session.article = null;
     req.session.validationMessages = null;
 
@@ -72,18 +105,21 @@ articlesRoutes.get(`/edit/:id`, isUserAdmin, async (req, res, next) => {
       api.getCategories(),
     ]);
 
+    article = {
+      ...article,
+      categories: article.categories.map((category) => category.id),
+    };
+
     if (updatedArticle) {
-      article = { ...article, id };
-
-      const articleCategories = article.categories.map((category) =>
-        category.id.toString()
-      );
-
-      article = { ...article, categories: articleCategories };
+      article = {
+        ...article,
+        id,
+      };
     }
 
     req.session.updatedArticle = null;
     req.session.validationMessages = null;
+
     return res.render(`views/articles/editor`, {
       article,
       categories,
@@ -125,6 +161,7 @@ articlesRoutes.post(
 
 articlesRoutes.get(`/:id`, async (req, res, next) => {
   const { id } = req.params;
+  const { referer } = req.headers;
   const { validationMessages = null } = req.session;
 
   try {
@@ -143,6 +180,7 @@ articlesRoutes.get(`/:id`, async (req, res, next) => {
       article,
       categories,
       validationMessages,
+      referer,
     });
   } catch (err) {
     return next();
