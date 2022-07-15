@@ -22,6 +22,7 @@ articlesRoutes.get(`/add`, isUserAdmin, async (req, res, next) => {
 
   try {
     const categories = await api.getCategories();
+
     req.session.article = null;
     req.session.validationMessages = null;
 
@@ -72,18 +73,21 @@ articlesRoutes.get(`/edit/:id`, isUserAdmin, async (req, res, next) => {
       api.getCategories(),
     ]);
 
+    article = {
+      ...article,
+      categories: article.categories.map((category) => category.id),
+    };
+
     if (updatedArticle) {
-      article = { ...article, id };
-
-      const articleCategories = article.categories.map((category) =>
-        category.id.toString()
-      );
-
-      article = { ...article, categories: articleCategories };
+      article = {
+        ...article,
+        id,
+      };
     }
 
     req.session.updatedArticle = null;
     req.session.validationMessages = null;
+
     return res.render(`views/articles/editor`, {
       article,
       categories,

@@ -25,6 +25,9 @@ class ArticleService {
       where: { id },
     });
 
+    const updatedArticle = await this._Article.findByPk(id);
+    await updatedArticle.setCategories(articleData.categories);
+
     return !!affectedRows;
   }
 

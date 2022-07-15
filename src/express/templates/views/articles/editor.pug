@@ -39,9 +39,9 @@ block content
                   if categories && categories.length
                     each category in categories
                       .new-publication__checkbox(class=`new-publication__checkbox--${category.id}`)
-                        input(id=`checkbox-${category.id}` type="checkbox" name="category[]" value=`${category.id}` checked=(article ? article.categories.find(({id}) => id === category.id) : false))
+                        input(id=`checkbox-${category.id}` type="checkbox" name="category[]" value=`${category.id}` checked=(article ? article.categories.find((id) => id == category.id) : false))
                         label(for=`checkbox-${category.id}`) #{category.name}
-                  a.new-publication__form-link.button.button--transparent(href='#') Добавить категорию
+                  a.new-publication__form-link.button.button--transparent(href='/my/categories') Добавить категорию
               .form__wrapper.form__wrapper--text
                 .form__field.form__field--publication-text
                   label
