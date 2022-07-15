@@ -322,8 +322,23 @@ if (typeof window === 'undefined' || typeof window.getComputedStyle !== 'functio
   };
 }
 
+
+let inputFile = document.querySelector('input[type="file"]');
+let inputPhoto = document.querySelector('input[name="photo"]')
+let deleteFileButton = document.querySelector('.js-delete-file');
+
+if (inputFile && inputPhoto && deleteFileButton) {
+  deleteFileButton.addEventListener('click', function(evt) {
+    console.log('rofl');
+    evt.preventDefault();
+    inputFile.value = '';
+    inputPhoto.value = '';
+  })
+}
+
 // if (textarea) {
 //   textarea.forEach(element => {
 //     autosize(element);
 //   });
 // }
+
