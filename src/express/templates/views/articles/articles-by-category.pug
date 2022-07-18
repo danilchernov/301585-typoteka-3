@@ -10,6 +10,6 @@ block content
 
     section.articles-category__list.preview
       h2.visually-hidden Список превью статей
-      +preview-list(articles)
+      +preview-articles-list(articles)
 
       +pagination({base: `articles/category/${currentCategory.id}`, page, totalPages})

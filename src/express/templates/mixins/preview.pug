@@ -1,4 +1,4 @@
-mixin preview-item(article = {})
+mixin preview-articles-item(article = {})
   li.preview__item
     if article.categories.length
       ul.preview__breadcrumbs
@@ -20,4 +20,9 @@ mixin preview-item(article = {})
       span.preview__cloud
       b.preview__comment-count #{article.comments.length || 0}
 
+mixin preview-articles-list(articles = [])
+  if articles.length
+    ul.preview__list
+      each article in articles
+        +preview-articles-item(article)
 
