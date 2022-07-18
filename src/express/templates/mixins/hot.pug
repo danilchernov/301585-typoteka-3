@@ -1,6 +1,6 @@
 mixin hot-articles-item(article = {})
   a.hot__list-link(href=`/articles/${article.id}`)
-    | #{article.announce.length > 100 ? `${article.announce.substr(0, 100)}...` : article.announce}
+    | #{article.announce.length > 100 ? `${article.announce.substring(0, 100)}...` : article.announce}
     sup.hot__link-sup #{article.count}
 
 
