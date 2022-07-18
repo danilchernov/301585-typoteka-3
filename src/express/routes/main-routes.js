@@ -3,7 +3,10 @@
 const { Router } = require(`express`);
 const { getApi } = require(`../api`);
 
-const { ARTICLES_PER_PAGE } = require(`../../constants`);
+const {
+  ARTICLES_PER_PAGE,
+  POPULAR_ARTICLES_PER_PAGE,
+} = require(`../../constants`);
 const jwtUtls = require(`../../lib/jwt`);
 
 const upload = require(`../middlewares/multer`);
@@ -21,15 +24,18 @@ mainRoutes.get(`/`, async (req, res, next) => {
   const offset = (page - 1) * ARTICLES_PER_PAGE;
 
   try {
-    const [{ count, articles }, categories] = await Promise.all([
-      api.getArticles({ comments: true, limit, offset }),
-      api.getCategories({ count: true }),
-    ]);
+    const [{ count, articles }, popularArticles, categories] =
+      await Promise.all([
+        api.getArticles({ comments: true, limit, offset }),
+        api.getPopularArticles({ limit: POPULAR_ARTICLES_PER_PAGE }),
+        api.getCategories({ count: true }),
+      ]);
 
     const totalPages = Math.ceil(count / ARTICLES_PER_PAGE);
 
     const data = {
       articles,
+      popularArticles,
       page,
       totalPages,
       categories,

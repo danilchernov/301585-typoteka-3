@@ -27,14 +27,18 @@ class API {
     });
   }
 
-  async getArticle(id, { comments } = {}) {
-    return await this._load(`/articles/${id}`, { params: { comments } });
-  }
-
   async getArticlesByCategory(id, { offset, limit } = {}) {
     return this._load(`/articles/category/${id}`, {
       params: { offset, limit },
     });
+  }
+
+  async getPopularArticles({ limit } = {}) {
+    return await this._load(`/articles/popular`, { params: { limit } });
+  }
+
+  async getArticle(id, { comments } = {}) {
+    return await this._load(`/articles/${id}`, { params: { comments } });
   }
 
   async createArticle(data, accessToken) {

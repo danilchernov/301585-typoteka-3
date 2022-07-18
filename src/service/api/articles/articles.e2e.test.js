@@ -21,6 +21,7 @@ const { HttpCode } = require(`../../../constants`);
 const {
   mockCategories,
   mockArticles,
+  mockComments,
   mockArticleId,
   mockValidArticle,
   mockInvalidArticle,
@@ -37,6 +38,7 @@ const createApi = async () => {
   await initDB(mockDB, {
     categories: mockCategories,
     articles: mockArticles,
+    comments: mockComments,
     users: mockUsers,
   });
 
@@ -92,6 +94,28 @@ describe(`API returns a list of all articles`, () => {
 
   test(`Should return a list of 5 articles`, () => {
     expect(response.body.length).toBe(5);
+  });
+});
+
+describe(`API returns a list of popular articles`, () => {
+  let app;
+  let response;
+
+  beforeAll(async () => {
+    app = await createApi();
+    response = await request(app).get(`/articles/popular?limit=5`);
+  });
+
+  test(`Should return status code 200`, () => {
+    expect(response.statusCode).toBe(HttpCode.OK);
+  });
+
+  test(`Should return a list of 5 articles`, () => {
+    expect(response.body.length).toBe(5);
+  });
+
+  test(`Should return the most popular article with id 3`, () => {
+    expect(response.body[0].id).toBe(3);
   });
 });
 

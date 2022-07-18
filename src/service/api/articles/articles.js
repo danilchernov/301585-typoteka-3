@@ -41,6 +41,13 @@ module.exports = ({ app, articleService, categoryService, logger } = {}) => {
     return res.status(HttpCode.OK).json(result);
   });
 
+  route.get(`/popular`, async (req, res) => {
+    const { limit } = req.query;
+    const popularArticles = await articleService.findAllPopular(limit);
+
+    return res.status(HttpCode.OK).json(popularArticles);
+  });
+
   route.post(
     `/`,
     [authenticateJwt, isUserAdmin, isArticleValid],
