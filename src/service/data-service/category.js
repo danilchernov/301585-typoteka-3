@@ -1,13 +1,13 @@
 "use strict";
 
+const { Sequelize } = require(`sequelize`);
+
 const Alias = require(`../models/alias`);
 
 class CategoryService {
   constructor(sequelize) {
-    this._sequelize = sequelize;
-
-    this._Category = this._sequelize.models.Category;
-    this._ArticleCategory = this._sequelize.models.ArticleCategory;
+    this._Category = sequelize.models.Category;
+    this._ArticleCategory = sequelize.models.ArticleCategory;
   }
 
   async create(categoryData) {
@@ -50,12 +50,9 @@ class CategoryService {
         attributes: [
           `id`,
           `name`,
-          [
-            this._sequelize.fn(`COUNT`, this._sequelize.col(`ArticleId`)),
-            `count`,
-          ],
+          [Sequelize.fn(`COUNT`, Sequelize.col(`ArticleId`)), `count`],
         ],
-        group: [this._sequelize.col(`Category.id`)],
+        group: [Sequelize.col(`Category.id`)],
         include: [
           {
             model: this._ArticleCategory,
