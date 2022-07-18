@@ -140,9 +140,10 @@ mainRoutes.get(`/search`, async (req, res) => {
   const results = await api.search(query);
   const data = { searchText: query, results };
 
-  return results.length
-    ? res.render(`views/main/search`, data)
-    : res.render(`views/main/search-empty`, data);
+  return res.render(
+    results.length ? `views/main/search` : `views/main/search-empty`,
+    data
+  );
 });
 
 mainRoutes.get(`/logout`, (req, res) => {
