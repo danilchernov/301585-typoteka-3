@@ -33,6 +33,13 @@ module.exports = ({ app, articleService, commentService, logger } = {}) => {
     return res.status(HttpCode.OK).json(comments);
   });
 
+  route.get(`/comments/last`, async (req, res) => {
+    const { limit } = req.query;
+    const comments = await commentService.findAllLast(limit);
+
+    return res.status(HttpCode.OK).json(comments);
+  });
+
   route.get(
     `/articles/:articleId/comments`,
     [isRouteParameterValid, isArticleExists],

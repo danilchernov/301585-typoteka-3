@@ -46,6 +46,16 @@ class CommentService {
 
     return comments.map((comment) => comment.get());
   }
+
+  async findAllLast(limit) {
+    const comments = await this._Comment.findAll({
+      include: [Alias.USERS],
+      order: [[`createdAt`, `DESC`]],
+      limit,
+    });
+
+    return comments.map((comment) => comment.get());
+  }
 }
 
 module.exports = CommentService;

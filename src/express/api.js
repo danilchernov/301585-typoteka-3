@@ -95,6 +95,10 @@ class API {
     });
   }
 
+  async getLastComments({ limit } = {}) {
+    return this._load(`/comments/last`, { params: { limit } });
+  }
+
   async createUser(data) {
     return await this._load(`/user`, {
       method: HttpMethod.POST,

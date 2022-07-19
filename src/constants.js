@@ -35,6 +35,8 @@ module.exports.ARTICLES_PER_PAGE = 8;
 
 module.exports.POPULAR_ARTICLES_PER_PAGE = 4;
 
+module.exports.LAST_COMMENTA_PER_PAGE = 4;
+
 module.exports.Article = {
   TITLE_MIN_LENGTH: 30,
   TITLE_MAX_LENGTH: 250,
