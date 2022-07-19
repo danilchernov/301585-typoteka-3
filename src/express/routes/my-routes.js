@@ -15,7 +15,10 @@ myRoutes.use(isUserAdmin);
 myRoutes.get(`/`, async (req, res, next) => {
   try {
     const articles = await api.getArticles();
-    return res.render(`views/my/index`, { articles });
+
+    const data = { articles };
+
+    return res.render(`views/my/index`, data);
   } catch (err) {
     return next(err);
   }
@@ -36,7 +39,10 @@ myRoutes.get(`/articles/:articleId`, async (req, res, next) => {
 myRoutes.get(`/comments`, async (req, res, next) => {
   try {
     const comments = await api.getAllComments();
-    return res.render(`views/my/comments`, { comments });
+
+    const data = { comments };
+
+    return res.render(`views/my/comments`, data);
   } catch (err) {
     return next(err);
   }
@@ -75,7 +81,8 @@ myRoutes.get(`/categories`, async (req, res, next) => {
 
   try {
     const categories = await api.getCategories();
-    return res.render(`views/my/categories`, {
+
+    const data = {
       categories,
       newCategory,
       creationValidationMessages,
@@ -83,7 +90,9 @@ myRoutes.get(`/categories`, async (req, res, next) => {
       updateValidationMessages,
       deletedCategory,
       deleteValidationMessages,
-    });
+    };
+
+    return res.render(`views/my/categories`, data);
   } catch (err) {
     return next(err);
   }

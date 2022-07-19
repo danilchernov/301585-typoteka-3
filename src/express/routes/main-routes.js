@@ -148,6 +148,7 @@ mainRoutes.get(`/search`, async (req, res) => {
 
   const { query } = req.query;
   const results = await api.search(query);
+
   const data = { searchText: query, results };
 
   return res.render(
