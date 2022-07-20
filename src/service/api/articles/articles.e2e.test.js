@@ -97,28 +97,6 @@ describe(`API returns a list of all articles`, () => {
   });
 });
 
-describe(`API returns a list of popular articles`, () => {
-  let app;
-  let response;
-
-  beforeAll(async () => {
-    app = await createApi();
-    response = await request(app).get(`/articles/popular?limit=5`);
-  });
-
-  test(`Should return status code 200`, () => {
-    expect(response.statusCode).toBe(HttpCode.OK);
-  });
-
-  test(`Should return a list of 5 articles`, () => {
-    expect(response.body.length).toBe(5);
-  });
-
-  test(`Should return the most popular article with id 3`, () => {
-    expect(response.body[0].id).toBe(3);
-  });
-});
-
 describe(`API returns an article with given id`, () => {
   let app;
   let response;
