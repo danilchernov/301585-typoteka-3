@@ -54,6 +54,7 @@ module.exports = ({ app, articleService, commentService, logger } = {}) => {
     `/articles/:articleId/comments`,
     [authenticateJwt, isArticleExists, isCommentValid],
     async (req, res) => {
+      const { io } = req.app.locals;
       const { user, article } = res.locals;
 
       const comment = await commentService.create(
@@ -61,6 +62,12 @@ module.exports = ({ app, articleService, commentService, logger } = {}) => {
         user.id,
         req.body
       );
+
+      const popularArticles = await articleService.findAllPopular();
+      io.emit(`popular-articles`, popularArticles);
+
+      const lastComments = await commentService.findAllLast();
+      io.emit(`last-comments`, lastComments);
 
       return res.status(HttpCode.CREATED).json(comment);
     }

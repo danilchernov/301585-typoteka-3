@@ -32,3 +32,26 @@ block content
       .preview__toggle-wrapper
         +pagination({page, totalPages})
 
+    template(id="popular-article-template")
+      li.hot__list-item
+        +hot-articles-item({
+          id: 'id',
+          announce: 'announce',
+          count: 'count'
+        })
+
+    template(id="last-comment-template")
+      li.last__list-item
+        +last-comments-item({
+          articleId: 'comment.articleId',
+          text: 'comment.text',
+          users: {
+            firstName: 'users.firstName',
+            lastName: 'users.lastName',
+            avatar: 'users.avatar'
+          }
+        })
+
+append scripts
+  script(src='https://cdn.socket.io/4.5.1/socket.io.min.js')
+  script(src='js/socket.js')

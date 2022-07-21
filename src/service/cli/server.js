@@ -1,9 +1,14 @@
 "use strict";
 
+const http = require(`http`);
 const express = require(`express`);
-const initializeApiRoutes = require(`../api`);
+
 const sequelize = require(`../lib/sequelize`);
+const socket = require(`../lib/socket`);
 const { getLogger } = require(`../lib/logger`);
+
+const initializeApiRoutes = require(`../api`);
+
 const { ExitCode, HttpCode, API_PREFIX } = require(`../../constants`);
 
 const DEFAULT_PORT = 3000;
@@ -31,6 +36,11 @@ app.use((req, res, next) => {
 
   return next();
 });
+
+const server = http.createServer(app);
+const io = socket(server);
+
+app.locals.io = io;
 
 module.exports = {
   name: `--server`,
@@ -65,7 +75,7 @@ module.exports = {
         );
       });
 
-      app.listen(port, () =>
+      server.listen(port, () =>
         logger.info(`Listening to connections on ${port}`)
       );
     } catch (err) {

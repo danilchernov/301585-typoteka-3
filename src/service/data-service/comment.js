@@ -47,7 +47,7 @@ class CommentService {
     return comments.map((comment) => comment.get());
   }
 
-  async findAllLast(limit) {
+  async findAllLast(limit = 4) {
     const comments = await this._Comment.findAll({
       include: [Alias.USERS],
       order: [[`createdAt`, `DESC`]],

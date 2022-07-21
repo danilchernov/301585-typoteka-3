@@ -13,7 +13,13 @@ const articleExists = require(`../../middlewares/article-exists`);
 const articleValidator = require(`../../middlewares/article-validator`);
 const articleSchema = require(`../../schemas/article`);
 
-module.exports = ({ app, articleService, categoryService, logger } = {}) => {
+module.exports = ({
+  app,
+  articleService,
+  commentService,
+  categoryService,
+  logger,
+} = {}) => {
   const route = new Router();
 
   const isRouteParameterValid = routeParameterValidator(
@@ -108,8 +114,15 @@ module.exports = ({ app, articleService, categoryService, logger } = {}) => {
     `/:articleId`,
     [authenticateJwt, isUserAdmin, isRouteParameterValid, isArticleExists],
     async (req, res) => {
+      const { io } = req.app.locals;
       const { article } = res.locals;
       const deleted = await articleService.delete(article.id);
+
+      const popularArticles = await articleService.findAllPopular();
+      io.emit(`popular-articles`, popularArticles);
+
+      const lastComments = await commentService.findAllLast();
+      io.emit(`last-comments`, lastComments);
 
       return res.status(HttpCode.OK).json(deleted);
     }
