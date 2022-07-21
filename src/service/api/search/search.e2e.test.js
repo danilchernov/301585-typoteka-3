@@ -1,9 +1,11 @@
 "use strict";
 
+const http = require(`http`);
 const express = require(`express`);
 const request = require(`supertest`);
 const Sequelize = require(`sequelize`);
 
+const socket = require(`../../lib/socket`);
 const initDB = require(`../../lib/init-db`);
 const { getLogger } = require(`../../lib/logger`);
 
@@ -15,9 +17,14 @@ const { HttpCode } = require(`../../../constants`);
 const { mockCategories, mockArticles } = require(`./search.mock`);
 const mockDB = new Sequelize(`sqlite::memory:`, { logging: false });
 
-const app = express();
-app.use(express.json());
 const logger = getLogger();
+
+const app = express();
+const server = http.createServer(app);
+const io = socket(server);
+
+app.locals.io = io;
+app.use(express.json());
 
 beforeAll(async () => {
   await initDB(mockDB, {

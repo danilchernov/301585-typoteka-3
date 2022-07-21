@@ -1,11 +1,12 @@
 "use strict";
 
+const http = require(`http`);
 const express = require(`express`);
 const request = require(`supertest`);
 const Sequelize = require(`sequelize`);
 
+const socket = require(`../../lib/socket`);
 const jwtUtils = require(`../../../lib/jwt`);
-
 const initDB = require(`../../lib/init-db`);
 const { getLogger } = require(`../../lib/logger`);
 
@@ -26,8 +27,13 @@ const createApi = async () => {
     comments: [],
   });
 
-  const app = express();
   const logger = getLogger();
+
+  const app = express();
+  const server = http.createServer(app);
+  const io = socket(server);
+
+  app.locals.io = io;
   app.use(express.json());
 
   user({ app, userService: new UserService(mockDB), logger });
