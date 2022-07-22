@@ -3,7 +3,11 @@
 const { Router } = require(`express`);
 const { getApi } = require(`../api`);
 
-const { COMMENTS_PER_PAGE, CATEGORIES_PER_PAGE } = require(`../../constants`);
+const {
+  COMMENTS_PER_PAGE,
+  CATEGORIES_PER_PAGE,
+  ARTICLES_PER_PAGE,
+} = require(`../../constants`);
 
 const upload = require(`../middlewares/multer`);
 const isUserAdmin = require(`../middlewares/is-user-admin`);
@@ -15,10 +19,18 @@ const myRoutes = new Router();
 myRoutes.use(isUserAdmin);
 
 myRoutes.get(`/`, async (req, res, next) => {
-  try {
-    const articles = await api.getArticles();
+  let { page = 1 } = req.query;
+  page = +page;
 
-    const data = { articles };
+  const limit = ARTICLES_PER_PAGE;
+  const offset = (page - 1) * ARTICLES_PER_PAGE;
+
+  try {
+    const { count, articles } = await api.getArticles({ limit, offset });
+
+    const totalPages = Math.ceil(count / ARTICLES_PER_PAGE);
+
+    const data = { articles, page, totalPages };
 
     return res.render(`views/my/index`, data);
   } catch (err) {
