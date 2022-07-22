@@ -32,6 +32,7 @@ module.exports.HttpMethod = {
 module.exports.API_PREFIX = `/api`;
 
 module.exports.ARTICLES_PER_PAGE = 8;
+module.exports.COMMENTS_PER_PAGE = 8;
 
 module.exports.POPULAR_ARTICLES_PER_PAGE = 4;
 

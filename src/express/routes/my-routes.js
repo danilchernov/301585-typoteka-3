@@ -3,6 +3,8 @@
 const { Router } = require(`express`);
 const { getApi } = require(`../api`);
 
+const { COMMENTS_PER_PAGE } = require(`../../constants`);
+
 const upload = require(`../middlewares/multer`);
 const isUserAdmin = require(`../middlewares/is-user-admin`);
 
@@ -37,10 +39,18 @@ myRoutes.get(`/articles/:articleId`, async (req, res, next) => {
 });
 
 myRoutes.get(`/comments`, async (req, res, next) => {
-  try {
-    const comments = await api.getAllComments();
+  let { page = 1 } = req.query;
+  page = +page;
 
-    const data = { comments };
+  const limit = COMMENTS_PER_PAGE;
+  const offset = (page - 1) * COMMENTS_PER_PAGE;
+
+  try {
+    const { count, comments } = await api.getComments({ limit, offset });
+
+    const totalPages = Math.ceil(count / COMMENTS_PER_PAGE);
+
+    const data = { comments, page, totalPages };
 
     return res.render(`views/my/comments`, data);
   } catch (err) {

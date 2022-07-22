@@ -89,9 +89,10 @@ class API {
     });
   }
 
-  async getAllComments() {
+  async getComments({ limit, offset } = {}) {
     return await this._load(`/comments`, {
       method: HttpMethod.GET,
+      params: { limit, offset },
     });
   }
 
