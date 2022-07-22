@@ -3,7 +3,7 @@
 const { Router } = require(`express`);
 const { getApi } = require(`../api`);
 
-const { COMMENTS_PER_PAGE } = require(`../../constants`);
+const { COMMENTS_PER_PAGE, CATEGORIES_PER_PAGE } = require(`../../constants`);
 
 const upload = require(`../middlewares/multer`);
 const isUserAdmin = require(`../middlewares/is-user-admin`);
@@ -89,11 +89,21 @@ myRoutes.get(`/categories`, async (req, res, next) => {
   req.session.deletedCategory = null;
   req.session.deleteValidationMessages = null;
 
+  let { page = 1 } = req.query;
+  page = +page;
+
+  const limit = COMMENTS_PER_PAGE;
+  const offset = (page - 1) * CATEGORIES_PER_PAGE;
+
   try {
-    const categories = await api.getCategories();
+    const { count, categories } = await api.getCategories({ limit, offset });
+
+    const totalPages = Math.ceil(count / CATEGORIES_PER_PAGE);
 
     const data = {
       categories,
+      page,
+      totalPages,
       newCategory,
       creationValidationMessages,
       updatedCategory,

@@ -77,6 +77,16 @@ class CategoryService {
       raw: true,
     }));
   }
+
+  async findPage({ limit, offset } = {}) {
+    const { count, rows } = await this._Category.findAndCountAll({
+      order: [[`createdAt`, `DESC`]],
+      limit,
+      offset,
+    });
+
+    return { count, categories: rows };
+  }
 }
 
 module.exports = CategoryService;

@@ -36,10 +36,14 @@ module.exports = ({ app, categoryService, logger } = {}) => {
   app.use(`/categories`, route);
 
   route.get(`/`, async (req, res) => {
-    const { count = false } = req.query;
-    const categories = await categoryService.findAll({ count });
+    const { count = false, limit = null, offset = null } = req.query;
 
-    return res.status(HttpCode.OK).json(categories);
+    const result =
+      limit || offset
+        ? await categoryService.findPage({ limit, offset })
+        : await categoryService.findAll({ count });
+
+    return res.status(HttpCode.OK).json(result);
   });
 
   route.get(`/:categoryId`, isRouteParameterValid, async (req, res) => {

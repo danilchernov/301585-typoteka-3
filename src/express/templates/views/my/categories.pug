@@ -17,21 +17,23 @@ block content
           each error in creationValidationMessages
             p.form__error-message #{error}
 
-      if categories.length
-        ul.category__list
-          each category in categories
-            li.category__list-item
-              form(action=`/my/categories/${category.id}` method="POST" enctype="multipart/form-data")
-                input(id=`#modify-form-category-${category.id}` type='text' name=`category-${category.id}` value=(updatedCategory && updatedCategory.id === category.id ? updatedCategory.name : category.name))
-                label(for=`modify-form-category-${category.id}`)
-                  span.visually-hidden Редактировать категорию
-                button.category__button.button.button--category(type='submit') Сохранить
-                a.category__button.button.button--category(href=`/my/categories/${category.id}`) Удалить
-            if updatedCategory && updatedCategory.id === category.id && updateValidationMessages
-              each error in updateValidationMessages
-                li.category__list-item
-                  p.form__error-message #{error}
-            if deletedCategory && deletedCategory.id === category.id && deleteValidationMessages
-              each error in deleteValidationMessages
-                li.category__list-item
-                  p.form__error-message #{error}
+      ul.category__list
+        each category in categories
+          li.category__list-item
+            form(action=`/my/categories/${category.id}` method="POST" enctype="multipart/form-data")
+              input(id=`#modify-form-category-${category.id}` type='text' name=`category-${category.id}` value=(updatedCategory && updatedCategory.id === category.id ? updatedCategory.name : category.name))
+              label(for=`modify-form-category-${category.id}`)
+                span.visually-hidden Редактировать категорию
+              button.category__button.button.button--category(type='submit') Сохранить
+              a.category__button.button.button--category(href=`/my/categories/${category.id}`) Удалить
+          if updatedCategory && updatedCategory.id === category.id && updateValidationMessages
+            each error in updateValidationMessages
+              li.category__list-item
+                p.form__error-message #{error}
+          if deletedCategory && deletedCategory.id === category.id && deleteValidationMessages
+            each error in deleteValidationMessages
+              li.category__list-item
+                p.form__error-message #{error}
+      if totalPages > 1
+        .preview__toggle-wrapper
+          +pagination({base: '/my/categories', page, totalPages})

@@ -118,8 +118,10 @@ class API {
     return await this._load(`/search`, { params: { query } });
   }
 
-  async getCategories({ count } = {}) {
-    return await this._load(`/categories`, { params: { count } });
+  async getCategories({ count, offset, limit } = {}) {
+    return await this._load(`/categories`, {
+      params: { count, offset, limit },
+    });
   }
 
   async getCategory(id) {
