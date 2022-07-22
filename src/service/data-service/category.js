@@ -83,6 +83,7 @@ class CategoryService {
       order: [[`createdAt`, `DESC`]],
       limit,
       offset,
+      distinct: true,
     });
 
     return { count, categories: rows };
