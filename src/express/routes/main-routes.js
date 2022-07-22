@@ -3,7 +3,12 @@
 const { Router } = require(`express`);
 const { getApi } = require(`../api`);
 
-const { ARTICLES_PER_PAGE } = require(`../../constants`);
+const {
+  ARTICLES_PER_PAGE,
+  POPULAR_ARTICLES_PER_PAGE,
+  LAST_COMMENTA_PER_PAGE,
+} = require(`../../constants`);
+
 const jwtUtls = require(`../../lib/jwt`);
 
 const upload = require(`../middlewares/multer`);
@@ -21,15 +26,20 @@ mainRoutes.get(`/`, async (req, res, next) => {
   const offset = (page - 1) * ARTICLES_PER_PAGE;
 
   try {
-    const [{ count, articles }, categories] = await Promise.all([
-      api.getArticles({ comments: true, limit, offset }),
-      api.getCategories({ count: true }),
-    ]);
+    const [{ count, articles }, popularArticles, categories, lastComments] =
+      await Promise.all([
+        api.getArticles({ comments: true, limit, offset }),
+        api.getPopularArticles({ limit: POPULAR_ARTICLES_PER_PAGE }),
+        api.getCategories({ count: true }),
+        api.getLastComments({ limit: LAST_COMMENTA_PER_PAGE }),
+      ]);
 
     const totalPages = Math.ceil(count / ARTICLES_PER_PAGE);
 
     const data = {
       articles,
+      popularArticles,
+      lastComments,
       page,
       totalPages,
       categories,
@@ -138,11 +148,13 @@ mainRoutes.get(`/search`, async (req, res) => {
 
   const { query } = req.query;
   const results = await api.search(query);
+
   const data = { searchText: query, results };
 
-  return results.length
-    ? res.render(`views/main/search`, data)
-    : res.render(`views/main/search-empty`, data);
+  return res.render(
+    results.length ? `views/main/search` : `views/main/search-empty`,
+    data
+  );
 });
 
 mainRoutes.get(`/logout`, (req, res) => {

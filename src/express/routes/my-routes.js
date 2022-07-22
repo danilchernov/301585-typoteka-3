@@ -3,6 +3,12 @@
 const { Router } = require(`express`);
 const { getApi } = require(`../api`);
 
+const {
+  COMMENTS_PER_PAGE,
+  CATEGORIES_PER_PAGE,
+  ARTICLES_PER_PAGE,
+} = require(`../../constants`);
+
 const upload = require(`../middlewares/multer`);
 const isUserAdmin = require(`../middlewares/is-user-admin`);
 
@@ -13,9 +19,20 @@ const myRoutes = new Router();
 myRoutes.use(isUserAdmin);
 
 myRoutes.get(`/`, async (req, res, next) => {
+  let { page = 1 } = req.query;
+  page = +page;
+
+  const limit = ARTICLES_PER_PAGE;
+  const offset = (page - 1) * ARTICLES_PER_PAGE;
+
   try {
-    const articles = await api.getArticles();
-    return res.render(`views/my/index`, { articles });
+    const { count, articles } = await api.getArticles({ limit, offset });
+
+    const totalPages = Math.ceil(count / ARTICLES_PER_PAGE);
+
+    const data = { articles, page, totalPages };
+
+    return res.render(`views/my/index`, data);
   } catch (err) {
     return next(err);
   }
@@ -34,9 +51,20 @@ myRoutes.get(`/articles/:articleId`, async (req, res, next) => {
 });
 
 myRoutes.get(`/comments`, async (req, res, next) => {
+  let { page = 1 } = req.query;
+  page = +page;
+
+  const limit = COMMENTS_PER_PAGE;
+  const offset = (page - 1) * COMMENTS_PER_PAGE;
+
   try {
-    const comments = await api.getAllComments();
-    return res.render(`views/my/comments`, { comments });
+    const { count, comments } = await api.getComments({ limit, offset });
+
+    const totalPages = Math.ceil(count / COMMENTS_PER_PAGE);
+
+    const data = { comments, page, totalPages };
+
+    return res.render(`views/my/comments`, data);
   } catch (err) {
     return next(err);
   }
@@ -73,17 +101,30 @@ myRoutes.get(`/categories`, async (req, res, next) => {
   req.session.deletedCategory = null;
   req.session.deleteValidationMessages = null;
 
+  let { page = 1 } = req.query;
+  page = +page;
+
+  const limit = COMMENTS_PER_PAGE;
+  const offset = (page - 1) * CATEGORIES_PER_PAGE;
+
   try {
-    const categories = await api.getCategories();
-    return res.render(`views/my/categories`, {
+    const { count, categories } = await api.getCategories({ limit, offset });
+
+    const totalPages = Math.ceil(count / CATEGORIES_PER_PAGE);
+
+    const data = {
       categories,
+      page,
+      totalPages,
       newCategory,
       creationValidationMessages,
       updatedCategory,
       updateValidationMessages,
       deletedCategory,
       deleteValidationMessages,
-    });
+    };
+
+    return res.render(`views/my/categories`, data);
   } catch (err) {
     return next(err);
   }

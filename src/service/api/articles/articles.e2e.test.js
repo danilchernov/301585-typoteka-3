@@ -1,9 +1,11 @@
 "use strict";
 
+const http = require(`http`);
 const express = require(`express`);
 const request = require(`supertest`);
 const Sequelize = require(`sequelize`);
 
+const socket = require(`../../lib/socket`);
 const initDB = require(`../../lib/init-db`);
 const { getLogger } = require(`../../lib/logger`);
 
@@ -21,6 +23,7 @@ const { HttpCode } = require(`../../../constants`);
 const {
   mockCategories,
   mockArticles,
+  mockComments,
   mockArticleId,
   mockValidArticle,
   mockInvalidArticle,
@@ -37,16 +40,23 @@ const createApi = async () => {
   await initDB(mockDB, {
     categories: mockCategories,
     articles: mockArticles,
+    comments: mockComments,
     users: mockUsers,
   });
 
-  const app = express();
   const logger = getLogger();
+
+  const app = express();
+  const server = http.createServer(app);
+  const io = socket(server);
+
+  app.locals.io = io;
   app.use(express.json());
 
   articles({
     app,
     articleService: new ArticleService(mockDB),
+    commentService: new CommentService(mockDB),
     categoryService: new CategoryService(mockDB),
     logger,
   });

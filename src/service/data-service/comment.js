@@ -46,6 +46,28 @@ class CommentService {
 
     return comments.map((comment) => comment.get());
   }
+
+  async findAllLast(limit = 4) {
+    const comments = await this._Comment.findAll({
+      include: [Alias.USERS],
+      order: [[`createdAt`, `DESC`]],
+      limit,
+    });
+
+    return comments.map((comment) => comment.get());
+  }
+
+  async findPage({ limit, offset } = {}) {
+    const { count, rows } = await this._Comment.findAndCountAll({
+      include: [Alias.USERS, Alias.ARTICLES],
+      order: [[`createdAt`, `DESC`]],
+      limit,
+      offset,
+      distinct: true,
+    });
+
+    return { count, comments: rows };
+  }
 }
 
 module.exports = CommentService;

@@ -58,11 +58,13 @@ articlesRoutes.get(`/add`, isUserAdmin, async (req, res, next) => {
     req.session.article = null;
     req.session.validationMessages = null;
 
-    return res.render(`views/articles/editor`, {
+    const data = {
       article,
       categories,
       validationMessages,
-    });
+    };
+
+    return res.render(`views/articles/editor`, data);
   } catch (err) {
     return next();
   }
@@ -120,11 +122,13 @@ articlesRoutes.get(`/edit/:id`, isUserAdmin, async (req, res, next) => {
     req.session.updatedArticle = null;
     req.session.validationMessages = null;
 
-    return res.render(`views/articles/editor`, {
+    const data = {
       article,
       categories,
       validationMessages,
-    });
+    };
+
+    return res.render(`views/articles/editor`, data);
   } catch (err) {
     return next(err);
   }
@@ -176,12 +180,14 @@ articlesRoutes.get(`/:id`, async (req, res, next) => {
 
     req.session.validationMessages = null;
 
-    return res.render(`views/articles/article`, {
+    const data = {
       article,
       categories,
       validationMessages,
       referer,
-    });
+    };
+
+    return res.render(`views/articles/article`, data);
   } catch (err) {
     return next();
   }

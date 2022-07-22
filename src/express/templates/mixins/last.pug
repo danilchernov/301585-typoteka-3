@@ -1,0 +1,13 @@
+mixin last-comments-item(comment = {})
+  img.last__list-image(src=`img/${comment.users.avatar}` width='20' height='20' alt='Аватар пользователя')
+  b.last__list-name #{comment.users.firstName} #{comment.users.lastName}
+  a.last__list-link(href=`/articles/${comment.articleId}`) #{comment.text.length > 100 ? `${comment.text.substring(0, 100)}...` : comment.text}
+
+mixin last-comments-list(comments = [])
+  if comments.length
+    ul.last__list
+      each comment in comments
+        li.last__list-item
+          +last-comments-item(comment)
+  else
+    p.last__empty Здесь пока ничего нет...

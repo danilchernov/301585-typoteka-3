@@ -329,7 +329,6 @@ let deleteFileButton = document.querySelector('.js-delete-file');
 
 if (inputFile && inputPhoto && deleteFileButton) {
   deleteFileButton.addEventListener('click', function(evt) {
-    console.log('rofl');
     evt.preventDefault();
     inputFile.value = '';
     inputPhoto.value = '';

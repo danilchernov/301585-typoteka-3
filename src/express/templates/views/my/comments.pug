@@ -19,3 +19,6 @@ block content
             p.publication__text-strong #{comment.articles.title}
             a.publication__button.button.button--close-item(href=`/my/comments/${comment.articles.id}/${comment.id}`)
               span.visually-hidden Закрыть строку списка
+      if totalPages > 1
+        .preview__toggle-wrapper
+          +pagination({base: '/my/comments', page, totalPages})

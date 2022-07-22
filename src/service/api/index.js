@@ -30,6 +30,7 @@ module.exports = (logger) => {
     app,
     articleService: new ArticleService(sequelize),
     categoryService: new CategoryService(sequelize),
+    commentService: new CommentService(sequelize),
     logger,
   });
 

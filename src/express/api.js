@@ -27,14 +27,18 @@ class API {
     });
   }
 
-  async getArticle(id, { comments } = {}) {
-    return await this._load(`/articles/${id}`, { params: { comments } });
-  }
-
   async getArticlesByCategory(id, { offset, limit } = {}) {
     return this._load(`/articles/category/${id}`, {
       params: { offset, limit },
     });
+  }
+
+  async getPopularArticles({ limit } = {}) {
+    return await this._load(`/articles/popular`, { params: { limit } });
+  }
+
+  async getArticle(id, { comments } = {}) {
+    return await this._load(`/articles/${id}`, { params: { comments } });
   }
 
   async createArticle(data, accessToken) {
@@ -85,10 +89,15 @@ class API {
     });
   }
 
-  async getAllComments() {
+  async getComments({ limit, offset } = {}) {
     return await this._load(`/comments`, {
       method: HttpMethod.GET,
+      params: { limit, offset },
     });
+  }
+
+  async getLastComments({ limit } = {}) {
+    return this._load(`/comments/last`, { params: { limit } });
   }
 
   async createUser(data) {
@@ -109,8 +118,10 @@ class API {
     return await this._load(`/search`, { params: { query } });
   }
 
-  async getCategories({ count } = {}) {
-    return await this._load(`/categories`, { params: { count } });
+  async getCategories({ count, offset, limit } = {}) {
+    return await this._load(`/categories`, {
+      params: { count, offset, limit },
+    });
   }
 
   async getCategory(id) {
