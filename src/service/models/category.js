@@ -12,7 +12,7 @@ const define = (sequelize) => {
   return Category.init(
     {
       name: {
-        type: DataTypes.STRING(30),
+        type: DataTypes.STRING,
         allowNull: false,
         unique: true,
       },
