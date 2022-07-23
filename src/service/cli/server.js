@@ -26,7 +26,7 @@ app.use((req, res, next) => {
     const message = `[${req.method}] Response status code ${res.statusCode} on route ${req.originalUrl}`;
 
     switch (res.statusCode) {
-      case 404:
+      case HttpCode.NOT_FOUND:
         logger.warn(message);
         break;
       default:
